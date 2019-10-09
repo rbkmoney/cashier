@@ -16,6 +16,8 @@
     </parent>
 
     <properties>
+        <sonar.jacoco.reportPath>target/sites/jacoco/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
         <shared.resources.version>0.3.6</shared.resources.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dockerfile.base.service.tag>bc95d0d6dc13c693acd2b274531a7d604b877bf3</dockerfile.base.service.tag>
@@ -209,7 +211,10 @@
                     <destFile>${sonar.jacoco.reportPath}</destFile>
                     <append>true</append>
                     <excludes>
-                        <exclude>com/rbkmoney/newway/util/**/*</exclude>
+                        <exclude>com/rbkmoney/cashier/config/**/*</exclude>
+                        <exclude>com/rbkmoney/cashier/domain/**/*</exclude>
+                        <exclude>com/rbkmoney/cashier/serde/**/*</exclude>
+                        <exclude>com/rbkmoney/cashier/parser/**/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
