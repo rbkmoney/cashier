@@ -1,0 +1,55 @@
+server:
+  port: @server.port@
+
+management:
+  security:
+    flag: false
+  metrics:
+    export:
+      statsd:
+        flavor: etsy
+        enabled: false
+
+spring:
+  application:
+    name: @project.name@
+  output:
+    ansi:
+      enabled: always
+info:
+  version: @project.version@
+
+client:
+  cash-reg:
+    enabled: true
+    url: http://changeit:8080
+    timeout: 5000
+
+kafka:
+  auto-startup: true
+  bootstrap-servers: localhost:9092
+  client-id: cashier
+  invoice-topic: mg-invoice-100-2
+  consumer:
+    group-id: cashier-group-1
+    enable-auto-commit: false
+    auto-offset-reset: latest
+    max-poll-records: 500
+    concurrency: 1
+  ssl:
+    enabled: false
+    key-store-type: "PKCS12"
+    key-store-location: "src/main/resources/cert/kenny-k.struzhkin.p12"
+    key-store-password: "kenny"
+    key-password: "kenny"
+    trust-store-type: "PKCS12"
+    trust-store-location: "src/main/resources/cert/truststore.p12"
+    trust-store-password: "kenny12"
+
+events:
+  path:
+    payment-processed: "invoice_payment_change.payload.invoice_payment_status_changed.status.processed"
+    payment-captured: "invoice_payment_change.payload.invoice_payment_status_changed.status.captured"
+    payment-cancelled: "invoice_payment_change.payload.invoice_payment_status_changed.status.cancelled"
+    payment-failed: "invoice_payment_change.payload.invoice_payment_status_changed.status.failed"
+    refund-succeeded: "invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_status_changed.status.succeeded"
