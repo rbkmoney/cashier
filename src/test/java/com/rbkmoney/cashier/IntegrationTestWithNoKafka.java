@@ -2,6 +2,7 @@ package com.rbkmoney.cashier;
 
 import com.rbkmoney.cashier.handler.EventsHandler;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
+import com.rbkmoney.cashier.repository.ProviderRepository;
 import com.rbkmoney.damsel.cashreg_processing.ManagementSrv;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.Invoice;
@@ -60,7 +61,10 @@ public class IntegrationTestWithNoKafka {
     private EventsHandler eventsHandler;
 
     @MockBean
-    private InvoiceAggregateRepository repository;
+    private InvoiceAggregateRepository invoiceAggregateRepository;
+
+    @MockBean
+    private ProviderRepository providerRepository;
 
     @MockBean
     private ManagementSrv.Iface cashRegClient;
@@ -85,8 +89,10 @@ public class IntegrationTestWithNoKafka {
                                 .setId("refundId")
                                 .setCart(new InvoiceCart(List.of()))))));
 
-        when(repository.findByInvoiceIdAndEventId("invoiceId", 0L))
+        when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
+        when(providerRepository.findBy())
+                .thenReturn("providerId");
     }
 
     @Test
@@ -159,14 +165,12 @@ public class IntegrationTestWithNoKafka {
                 partialCapture,
                 partialRefund));
 
-        MachineEvent event = new MachineEvent();
-        event.setCreatedAt(Instant.now().toString());
-        event.setEventId(0L);
-        event.setSourceNs("sourceNs");
-        event.setSourceId("invoiceId");
-        event.setData(com.rbkmoney.machinegun.msgpack.Value.bin(toByteArray(eventPayload)));
-
-        return event;
+        return new MachineEvent()
+                .setCreatedAt(Instant.now().toString())
+                .setEventId(0L)
+                .setSourceNs("sourceNs")
+                .setSourceId("invoiceId")
+                .setData(com.rbkmoney.machinegun.msgpack.Value.bin(toByteArray(eventPayload)));
     }
 
     @SneakyThrows

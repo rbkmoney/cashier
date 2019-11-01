@@ -3,6 +3,7 @@ package com.rbkmoney.cashier.handler.events;
 import com.rbkmoney.cashier.domain.InvoiceChangeWithMetadata;
 import com.rbkmoney.cashier.handler.events.iface.AbstractEventHandler;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
+import com.rbkmoney.cashier.repository.ProviderRepository;
 import com.rbkmoney.cashier.service.CashRegService;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
 import com.rbkmoney.damsel.payment_processing.Invoice;
@@ -14,15 +15,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentCancelledHandler extends AbstractEventHandler {
 
-    private final InvoiceAggregateRepository repository;
+    private final InvoiceAggregateRepository invoiceAggregateRepository;
+    private final ProviderRepository providerRepository;
     private final CashRegService cashRegService;
 
     public PaymentCancelledHandler(
-            @Value("${events.path.payment-cancelled}")String path,
-            InvoiceAggregateRepository repository,
+            @Value("${events.path.payment-cancelled}") String path,
+            InvoiceAggregateRepository invoiceAggregateRepository,
+            ProviderRepository providerRepository,
             CashRegService cashRegService) {
         super(path);
-        this.repository = repository;
+        this.invoiceAggregateRepository = invoiceAggregateRepository;
+        this.providerRepository = providerRepository;
         this.cashRegService = cashRegService;
     }
 
@@ -33,11 +37,15 @@ public class PaymentCancelledHandler extends AbstractEventHandler {
 
         log.debug("Handling new PaymentCancelled event: invoiceId={}, eventId={}...", invoiceId, eventId);
 
-        Invoice aggregate = repository.findByInvoiceIdAndEventId(
+        Invoice aggregate = invoiceAggregateRepository.findByInvoiceIdAndEventId(
                 invoiceId,
                 eventId);
 
-        CashRegParams refundDebitForInvoice = cashRegService.refundDebitForInvoice(aggregate);
+        String providerId = providerRepository.findBy();
+
+        CashRegParams refundDebitForInvoice = cashRegService.refundDebitForInvoice(
+                providerId,
+                aggregate);
 
         cashRegService.send(refundDebitForInvoice);
 

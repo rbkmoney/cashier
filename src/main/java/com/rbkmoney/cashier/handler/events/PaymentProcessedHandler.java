@@ -3,6 +3,7 @@ package com.rbkmoney.cashier.handler.events;
 import com.rbkmoney.cashier.domain.InvoiceChangeWithMetadata;
 import com.rbkmoney.cashier.handler.events.iface.AbstractEventHandler;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
+import com.rbkmoney.cashier.repository.ProviderRepository;
 import com.rbkmoney.cashier.service.CashRegService;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
 import com.rbkmoney.damsel.payment_processing.Invoice;
@@ -14,15 +15,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentProcessedHandler extends AbstractEventHandler {
 
-    private final InvoiceAggregateRepository repository;
+    private final InvoiceAggregateRepository invoiceAggregateRepository;
+    private final ProviderRepository providerRepository;
     private final CashRegService cashRegService;
 
     public PaymentProcessedHandler(
             @Value("${events.path.payment-processed}") String path,
             InvoiceAggregateRepository repository,
+            ProviderRepository providerRepository,
             CashRegService cashRegService) {
         super(path);
-        this.repository = repository;
+        this.invoiceAggregateRepository = repository;
+        this.providerRepository = providerRepository;
         this.cashRegService = cashRegService;
     }
 
@@ -33,11 +37,15 @@ public class PaymentProcessedHandler extends AbstractEventHandler {
 
         log.debug("Handling new PaymentProcessed event: invoiceId={}, eventId={}...", invoiceId, eventId);
 
-        Invoice aggregate = repository.findByInvoiceIdAndEventId(
+        Invoice aggregate = invoiceAggregateRepository.findByInvoiceIdAndEventId(
                 invoiceId,
                 eventId);
 
-        CashRegParams debitForInvoice = cashRegService.debitForInvoice(aggregate);
+        String providerId = providerRepository.findBy();
+
+        CashRegParams debitForInvoice = cashRegService.debitForInvoice(
+                providerId,
+                aggregate);
 
         cashRegService.send(debitForInvoice);
 

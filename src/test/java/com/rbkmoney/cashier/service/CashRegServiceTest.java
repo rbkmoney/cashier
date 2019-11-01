@@ -78,7 +78,9 @@ public class CashRegServiceTest {
                                 .setId("paymentId"))));
 
         // When
-        CashRegParams receipt = cashRegService.debitForInvoice(aggregate);
+        CashRegParams receipt = cashRegService.debitForInvoice(
+                "providerId",
+                aggregate);
 
         // Then
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
@@ -116,7 +118,10 @@ public class CashRegServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        CashRegParams receipt = cashRegService.debitForPartialCapture(aggregate, capturedPayment);
+        CashRegParams receipt = cashRegService.debitForPartialCapture(
+                "providerId",
+                aggregate,
+                capturedPayment);
 
         // Then
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
@@ -159,7 +164,10 @@ public class CashRegServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        CashRegParams receipt = cashRegService.debitForPartialRefund(aggregate, refund);
+        CashRegParams receipt = cashRegService.debitForPartialRefund(
+                "providerId",
+                aggregate,
+                refund);
 
         // Then
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
@@ -190,7 +198,9 @@ public class CashRegServiceTest {
                                 .setId("paymentId"))));
 
         // When
-        CashRegParams receipt = cashRegService.refundDebitForInvoice(aggregate);
+        CashRegParams receipt = cashRegService.refundDebitForInvoice(
+                "providerId",
+                aggregate);
 
         // Then
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
@@ -233,7 +243,10 @@ public class CashRegServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        CashRegParams receipt = cashRegService.refundDebitForPreviousPartialRefund(aggregate, refund);
+        CashRegParams receipt = cashRegService.refundDebitForPreviousPartialRefund(
+                "providerId",
+                aggregate,
+                refund);
 
         // Then
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");

@@ -24,6 +24,9 @@ client:
     enabled: true
     url: http://changeit:8080
     timeout: 5000
+  invoicing:
+    url: http://changeit:8080
+    timeout: 5000
 
 kafka:
   auto-startup: true
@@ -38,13 +41,6 @@ kafka:
     concurrency: 1
   ssl:
     enabled: false
-    key-store-type: "PKCS12"
-    key-store-location: "src/main/resources/cert/kenny-k.struzhkin.p12"
-    key-store-password: "kenny"
-    key-password: "kenny"
-    trust-store-type: "PKCS12"
-    trust-store-location: "src/main/resources/cert/truststore.p12"
-    trust-store-password: "kenny12"
 
 events:
   path:

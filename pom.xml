@@ -26,8 +26,9 @@
         <java.version>11</java.version>
         <exposed.ports>${server.port}</exposed.ports>
         <geck.version>0.6.4</geck.version>
-        <damsel.version>1.320-95ff602</damsel.version>
+        <damsel.version>1.346-36765b1</damsel.version>
         <fistful-proto.version>1.36-683822a</fistful-proto.version>
+        <cashreg-proto.version>1.9-9c79023</cashreg-proto.version>
         <spring.kafka.version>2.2.3.RELEASE</spring.kafka.version>
     </properties>
 
@@ -64,7 +65,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>cashreg-proto</artifactId>
-            <version>1.5-c0ce235</version>
+            <version>${cashreg-proto.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>

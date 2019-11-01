@@ -3,6 +3,7 @@ package com.rbkmoney.cashier.handler.events;
 import com.rbkmoney.cashier.domain.InvoiceChangeWithMetadata;
 import com.rbkmoney.cashier.handler.events.iface.AbstractEventHandler;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
+import com.rbkmoney.cashier.repository.ProviderRepository;
 import com.rbkmoney.cashier.service.CashRegService;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
 import com.rbkmoney.damsel.domain.InvoicePaymentCaptured;
@@ -15,15 +16,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentCapturedHandler extends AbstractEventHandler {
 
-    private final InvoiceAggregateRepository repository;
+    private final InvoiceAggregateRepository invoiceAggregateRepository;
+    private final ProviderRepository providerRepository;
     private final CashRegService cashRegService;
 
     public PaymentCapturedHandler(
             @Value("${events.path.payment-captured}") String path,
-            InvoiceAggregateRepository repository,
+            InvoiceAggregateRepository invoiceAggregateRepository,
+            ProviderRepository providerRepository,
             CashRegService cashRegService) {
         super(path);
-        this.repository = repository;
+        this.invoiceAggregateRepository = invoiceAggregateRepository;
+        this.providerRepository = providerRepository;
         this.cashRegService = cashRegService;
     }
 
@@ -48,12 +52,20 @@ public class PaymentCapturedHandler extends AbstractEventHandler {
             return;
         }
 
-        Invoice aggregate = repository.findByInvoiceIdAndEventId(
+        Invoice aggregate = invoiceAggregateRepository.findByInvoiceIdAndEventId(
                 invoiceId,
                 eventId);
 
-        CashRegParams refundDebitForInvoice = cashRegService.refundDebitForInvoice(aggregate);
-        CashRegParams debitForPartialCapture = cashRegService.debitForPartialCapture(aggregate, capturedPayment);
+        String providerId = providerRepository.findBy();
+
+        CashRegParams refundDebitForInvoice = cashRegService.refundDebitForInvoice(
+                providerId,
+                aggregate);
+
+        CashRegParams debitForPartialCapture = cashRegService.debitForPartialCapture(
+                providerId,
+                aggregate,
+                capturedPayment);
 
         cashRegService.send(
                 refundDebitForInvoice,

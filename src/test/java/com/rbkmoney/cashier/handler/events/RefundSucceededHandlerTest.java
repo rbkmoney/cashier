@@ -2,6 +2,7 @@ package com.rbkmoney.cashier.handler.events;
 
 import com.rbkmoney.cashier.domain.InvoiceChangeWithMetadata;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
+import com.rbkmoney.cashier.repository.ProviderRepository;
 import com.rbkmoney.cashier.service.CashRegService;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
 import com.rbkmoney.damsel.domain.*;
@@ -17,16 +18,26 @@ import static org.mockito.Mockito.*;
 
 public class RefundSucceededHandlerTest {
 
-    private InvoiceAggregateRepository repository;
+    private InvoiceAggregateRepository invoiceAggregateRepository;
+    private ProviderRepository providerRepository;
     private CashRegService cashRegService;
 
     private RefundSucceededHandler handler;
 
     @Before
     public void setUp() {
-        repository = mock(InvoiceAggregateRepository.class);
+        invoiceAggregateRepository = mock(InvoiceAggregateRepository.class);
+        providerRepository = mock(ProviderRepository.class);
         cashRegService = mock(CashRegService.class);
-        handler = new RefundSucceededHandler("", repository, cashRegService);
+
+        when(providerRepository.findBy())
+                .thenReturn("providerId");
+
+        handler = new RefundSucceededHandler(
+                "",
+                invoiceAggregateRepository,
+                providerRepository,
+                cashRegService);
     }
 
     @Test
@@ -51,7 +62,7 @@ public class RefundSucceededHandlerTest {
                         .setRefunds(List.of(new InvoicePaymentRefund()
                                 .setId("refundId")))));
 
-        when(repository.findByInvoiceIdAndEventId("invoiceId", 0L))
+        when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
 
         // When
@@ -59,7 +70,7 @@ public class RefundSucceededHandlerTest {
 
         // Then
         verify(cashRegService, times(1))
-                .refundDebitForInvoice(any());
+                .refundDebitForInvoice(any(), any());
         verify(cashRegService, times(1))
                 .send(any());
     }
@@ -92,9 +103,9 @@ public class RefundSucceededHandlerTest {
                                 new InvoicePaymentRefund()
                                         .setId("refundId")))));
 
-        when(cashRegService.refundDebitForPreviousPartialRefund(any(), any()))
+        when(cashRegService.refundDebitForPreviousPartialRefund(any(), any(), any()))
                 .thenReturn(new CashRegParams());
-        when(repository.findByInvoiceIdAndEventId("invoiceId", 0L))
+        when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
 
         // When
@@ -102,7 +113,7 @@ public class RefundSucceededHandlerTest {
 
         // Then
         verify(cashRegService, times(1))
-                .refundDebitForPreviousPartialRefund(any(), any());
+                .refundDebitForPreviousPartialRefund(any(), any(), any());
         verify(cashRegService, times(1))
                 .send(any());
     }
@@ -130,7 +141,7 @@ public class RefundSucceededHandlerTest {
                                 .setId("refundId")
                                 .setCart(new InvoiceCart())))));
 
-        when(repository.findByInvoiceIdAndEventId("invoiceId", 0L))
+        when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
 
         // When
@@ -138,9 +149,9 @@ public class RefundSucceededHandlerTest {
 
         // Then
         verify(cashRegService, times(1))
-                .refundDebitForInvoice(any());
+                .refundDebitForInvoice(any(), any());
         verify(cashRegService, times(1))
-                .debitForPartialRefund(any(), any());
+                .debitForPartialRefund(any(), any(), any());
         verify(cashRegService, times(2))
                 .send(any());
     }

@@ -53,13 +53,16 @@ public class CashRegService {
         }
     }
 
-    public CashRegParams debitForInvoice(Invoice aggregate) {
+    public CashRegParams debitForInvoice(
+            String providerId,
+            Invoice aggregate) {
         log.debug("Creating new DEBIT receipt for invoice...");
 
         Cash cash = aggregate.getInvoice().getCost();
         List<ItemsLine> items = cartTransformer.transform(aggregate.getInvoice().getDetails().getCart());
 
         return receipt(
+                providerId,
                 aggregate,
                 Type.debit(new Debit()),
                 cash,
@@ -67,6 +70,7 @@ public class CashRegService {
     }
 
     public CashRegParams debitForPartialCapture(
+            String providerId,
             Invoice aggregate,
             InvoicePaymentCaptured capturedPayment) {
         log.debug("Creating new DEBIT receipt for partial capture...");
@@ -75,6 +79,7 @@ public class CashRegService {
         List<ItemsLine> items = cartTransformer.transform(capturedPayment.getCart());
 
         return receipt(
+                providerId,
                 aggregate,
                 Type.debit(new Debit()),
                 cash,
@@ -82,6 +87,7 @@ public class CashRegService {
     }
 
     public CashRegParams debitForPartialRefund(
+            String providerId,
             Invoice aggregate,
             InvoicePaymentRefund refund) {
         log.debug("Creating new DEBIT receipt for partial refund...");
@@ -90,19 +96,23 @@ public class CashRegService {
         List<ItemsLine> items = cartTransformer.transform(refund.getCart());
 
         return receipt(
+                providerId,
                 aggregate,
                 Type.debit(new Debit()),
                 cash,
                 items);
     }
 
-    public CashRegParams refundDebitForInvoice(Invoice aggregate) {
+    public CashRegParams refundDebitForInvoice(
+            String providerId,
+            Invoice aggregate) {
         log.debug("Creating new REFUND_DEBIT receipt for invoice...");
 
         Cash cash = aggregate.getInvoice().getCost();
         List<ItemsLine> items = cartTransformer.transform(aggregate.getInvoice().getDetails().getCart());
 
         return receipt(
+                providerId,
                 aggregate,
                 Type.refund_debit(new RefundDebit()),
                 cash,
@@ -110,6 +120,7 @@ public class CashRegService {
     }
 
     public CashRegParams refundDebitForPreviousPartialRefund(
+            String providerId,
             Invoice aggregate,
             InvoicePaymentRefund refund) {
         log.debug("Creating new REFUND_DEBIT receipt for previous partial refund...");
@@ -118,6 +129,7 @@ public class CashRegService {
         List<ItemsLine> items = cartTransformer.transform(refund.getCart());
 
         return receipt(
+                providerId,
                 aggregate,
                 Type.refund_debit(new RefundDebit()),
                 cash,
@@ -125,6 +137,7 @@ public class CashRegService {
     }
 
     private CashRegParams receipt(
+            String providerId,
             Invoice aggregate,
             Type type,
             Cash cash,
@@ -139,7 +152,8 @@ public class CashRegService {
         String email = emailExtractor.extract(payments);
 
         CashRegParams receipt = new CashRegParams()
-                .setId(id)
+                .setCashregId(id)
+                .setCashregProviderId(providerId)
                 .setPartyId(partyId)
                 .setShopId(shopId)
                 .setType(type)
