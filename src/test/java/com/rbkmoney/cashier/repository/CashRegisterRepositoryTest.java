@@ -62,7 +62,7 @@ public class CashRegisterRepositoryTest {
                 .id("0")
                 .partyId("party-id-0")
                 .shopId("shop-id-0")
-                .providerId(1L)
+                .providerId(1)
                 .providerParams("{\"a\": \"b\"}")
                 .build();
 
@@ -82,7 +82,7 @@ public class CashRegisterRepositoryTest {
                 .id("1")
                 .partyId("party-id-2")
                 .shopId("shop-id-2")
-                .providerId(1L)
+                .providerId(1)
                 .providerParams("{\"a\": \"b\"}")
                 .build();
 
@@ -90,7 +90,7 @@ public class CashRegisterRepositoryTest {
                 .id("2")
                 .partyId("party-id-2")
                 .shopId("shop-id-2")
-                .providerId(2L)
+                .providerId(2)
                 .providerParams("{\"c\": \"d\"}")
                 .build();
 
@@ -98,7 +98,7 @@ public class CashRegisterRepositoryTest {
                 .id("3")
                 .partyId("some-other-party-id")
                 .shopId("some-other-shop-id")
-                .providerId(2L)
+                .providerId(2)
                 .providerParams("{\"c\": \"d\"}")
                 .build();
 

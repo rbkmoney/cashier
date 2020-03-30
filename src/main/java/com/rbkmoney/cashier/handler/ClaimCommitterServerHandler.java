@@ -44,7 +44,7 @@ public class ClaimCommitterServerHandler implements ClaimCommitterSrv.Iface {
 
                         if (cashRegisterModification.isSetCreation()) {
                             CashRegisterParams cashRegisterParams = cashRegisterModification.getCreation();
-                            long providerId = cashRegisterParams.getCashRegisterProviderId();
+                            int providerId = cashRegisterParams.getCashRegisterProviderId();
                             Map<String, String> providerParams = cashRegisterParams.getCashRegisterProviderParams();
                             CashRegister cashRegister = CashRegister.builder()
                                     .id(cashRegisterId)

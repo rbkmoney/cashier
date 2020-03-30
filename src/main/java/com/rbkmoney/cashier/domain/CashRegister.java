@@ -29,7 +29,7 @@ public class CashRegister implements Serializable {
     private String shopId;
 
     @Column(name = "provider_id")
-    private long providerId;
+    private int providerId;
 
     @Column(name = "provider_params")
     private String providerParams;
