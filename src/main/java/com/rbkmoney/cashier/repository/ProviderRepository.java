@@ -8,9 +8,10 @@ import java.util.Optional;
 
 @Slf4j
 @Repository
+
+// TODO [a.romanov]: remove
 public class ProviderRepository {
 
-    // TODO [a.romanov]: implementation
     public String findBy() {
         log.debug("Looking for provider with ={}", "");
 

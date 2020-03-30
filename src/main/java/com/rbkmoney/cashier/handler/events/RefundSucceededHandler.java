@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -116,7 +117,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
             List<InvoicePayment> payments,
             String currentRefundId) {
         return payments.stream()
-                .flatMap(payment -> payment.getRefunds().stream())
+                .flatMap(this::unwrapRefund)
                 .filter(refund -> !refund.getId().equals(currentRefundId))
                 .filter(InvoicePaymentRefund::isSetStatus)
                 .filter(refund -> refund.getStatus().isSetSucceeded())
@@ -128,9 +129,15 @@ public class RefundSucceededHandler extends AbstractEventHandler {
             List<InvoicePayment> payments,
             String refundId) {
         return payments.stream()
-                .flatMap(payment -> payment.getRefunds().stream())
+                .flatMap(this::unwrapRefund)
                 .filter(refund -> refund.getId().equals(refundId))
                 .filter(InvoicePaymentRefund::isSetCart)
                 .findAny();
+    }
+
+    private Stream<InvoicePaymentRefund> unwrapRefund(InvoicePayment payment) {
+        return payment.getRefunds()
+                .stream()
+                .map(com.rbkmoney.damsel.payment_processing.InvoicePaymentRefund::getRefund);
     }
 }

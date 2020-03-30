@@ -16,6 +16,23 @@ spring:
   output:
     ansi:
       enabled: always
+  jpa:
+    database: postgresql
+    properties:
+      hibernate:
+        default_schema: cashier
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/cashier
+    username: changeit
+    password: changeit
+  flyway:
+    schemas: cashier
+    url: jdbc:postgresql://localhost:5432/cashier
+    user: changeit
+    password: changeit
+
 info:
   version: @project.version@
 

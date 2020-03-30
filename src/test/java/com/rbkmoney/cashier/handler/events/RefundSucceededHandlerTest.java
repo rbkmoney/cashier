@@ -5,9 +5,9 @@ import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
 import com.rbkmoney.cashier.repository.ProviderRepository;
 import com.rbkmoney.cashier.service.CashRegService;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
-import com.rbkmoney.damsel.domain.*;
-import com.rbkmoney.damsel.payment_processing.Invoice;
-import com.rbkmoney.damsel.payment_processing.InvoicePayment;
+import com.rbkmoney.damsel.domain.InvoiceCart;
+import com.rbkmoney.damsel.domain.InvoicePaymentRefundStatus;
+import com.rbkmoney.damsel.domain.InvoicePaymentRefundSucceeded;
 import com.rbkmoney.damsel.payment_processing.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,6 @@ import static org.mockito.Mockito.*;
 public class RefundSucceededHandlerTest {
 
     private InvoiceAggregateRepository invoiceAggregateRepository;
-    private ProviderRepository providerRepository;
     private CashRegService cashRegService;
 
     private RefundSucceededHandler handler;
@@ -27,8 +26,8 @@ public class RefundSucceededHandlerTest {
     @Before
     public void setUp() {
         invoiceAggregateRepository = mock(InvoiceAggregateRepository.class);
-        providerRepository = mock(ProviderRepository.class);
         cashRegService = mock(CashRegService.class);
+        ProviderRepository providerRepository = mock(ProviderRepository.class);
 
         when(providerRepository.findBy())
                 .thenReturn("providerId");
@@ -60,7 +59,8 @@ public class RefundSucceededHandlerTest {
                 .setInvoice(new com.rbkmoney.damsel.domain.Invoice())
                 .setPayments(List.of(new InvoicePayment()
                         .setRefunds(List.of(new InvoicePaymentRefund()
-                                .setId("refundId")))));
+                                .setRefund(new com.rbkmoney.damsel.domain.InvoicePaymentRefund()
+                                        .setId("refundId"))))));
 
         when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
@@ -96,12 +96,14 @@ public class RefundSucceededHandlerTest {
                 .setPayments(List.of(new InvoicePayment()
                         .setRefunds(List.of(
                                 new InvoicePaymentRefund()
-                                        .setId("previousRefundId")
-                                        .setStatus(InvoicePaymentRefundStatus.succeeded(
-                                                new InvoicePaymentRefundSucceeded()))
-                                        .setCart(new InvoiceCart()),
+                                        .setRefund(new com.rbkmoney.damsel.domain.InvoicePaymentRefund()
+                                                .setId("previousRefundId")
+                                                .setStatus(InvoicePaymentRefundStatus.succeeded(
+                                                        new InvoicePaymentRefundSucceeded()))
+                                                .setCart(new InvoiceCart())),
                                 new InvoicePaymentRefund()
-                                        .setId("refundId")))));
+                                        .setRefund(new com.rbkmoney.damsel.domain.InvoicePaymentRefund()
+                                                .setId("refundId"))))));
 
         when(cashRegService.refundDebitForPreviousPartialRefund(any(), any(), any()))
                 .thenReturn(new CashRegParams());
@@ -138,8 +140,9 @@ public class RefundSucceededHandlerTest {
                 .setInvoice(new com.rbkmoney.damsel.domain.Invoice())
                 .setPayments(List.of(new InvoicePayment()
                         .setRefunds(List.of(new InvoicePaymentRefund()
-                                .setId("refundId")
-                                .setCart(new InvoiceCart())))));
+                                .setRefund(new com.rbkmoney.damsel.domain.InvoicePaymentRefund()
+                                        .setId("refundId")
+                                        .setCart(new InvoiceCart()))))));
 
         when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
