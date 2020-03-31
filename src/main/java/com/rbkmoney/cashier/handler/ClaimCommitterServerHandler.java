@@ -9,7 +9,7 @@ import lombok.SneakyThrows;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,41 +24,68 @@ public class ClaimCommitterServerHandler implements ClaimCommitterSrv.Iface {
     }
 
     @Override
-    @SneakyThrows
     public void commit(String partyId, Claim claim) {
-        for (ModificationUnit modificationUnit : claim.getChangeset()) {
-            Modification modification = modificationUnit.getModification();
+        claim.getChangeset()
+                .forEach(modificationUnit -> findCashRegister(partyId, modificationUnit)
+                        .ifPresent(cashRegisterRepository::save));
+    }
 
-            if (modification.isSetPartyModification()) {
-                PartyModification partyModification = modification.getPartyModification();
+    private Optional<CashRegister> findCashRegister(String partyId, ModificationUnit modificationUnit) {
+        CashRegister.CashRegisterBuilder builder = CashRegister.builder();
+        builder.partyId(partyId);
 
-                if (partyModification.isSetShopModification()) {
-                    ShopModificationUnit shopModificationUnit = partyModification.getShopModification();
-                    String shopId = shopModificationUnit.getId();
-                    ShopModification shopModification = shopModificationUnit.getModification();
+        Modification modification = modificationUnit.getModification();
+        return findInPartyModification(builder, modification);
+    }
 
-                    if (shopModification.isSetCashRegisterModificationUnit()) {
-                        CashRegisterModificationUnit cashRegisterModificationUnit = shopModification.getCashRegisterModificationUnit();
-                        String cashRegisterId = cashRegisterModificationUnit.getId();
-                        CashRegisterModification cashRegisterModification = cashRegisterModificationUnit.getModification();
-
-                        if (cashRegisterModification.isSetCreation()) {
-                            CashRegisterParams cashRegisterParams = cashRegisterModification.getCreation();
-                            int providerId = cashRegisterParams.getCashRegisterProviderId();
-                            Map<String, String> providerParams = cashRegisterParams.getCashRegisterProviderParams();
-                            CashRegister cashRegister = CashRegister.builder()
-                                    .id(cashRegisterId)
-                                    .partyId(partyId)
-                                    .shopId(shopId)
-                                    .providerId(providerId)
-                                    .providerParams(objectMapper.writeValueAsString(providerParams))
-                                    .build();
-
-                            cashRegisterRepository.save(cashRegister);
-                        }
-                    }
-                }
-            }
+    private Optional<CashRegister> findInPartyModification(
+            CashRegister.CashRegisterBuilder builder,
+            Modification modification) {
+        if (!modification.isSetPartyModification()) {
+            return Optional.empty();
         }
+
+        return findInShopModification(modification.getPartyModification(), builder);
+    }
+
+    private Optional<CashRegister> findInShopModification(
+            PartyModification partyModification,
+            CashRegister.CashRegisterBuilder builder) {
+        if (!partyModification.isSetShopModification()) {
+            return Optional.empty();
+        }
+
+        ShopModificationUnit shopModificationUnit = partyModification.getShopModification();
+        builder.shopId(shopModificationUnit.getId());
+
+        return findInCashRegisterModification(shopModificationUnit.getModification(), builder);
+    }
+
+    private Optional<CashRegister> findInCashRegisterModification(
+            ShopModification shopModification,
+            CashRegister.CashRegisterBuilder builder) {
+        if (!shopModification.isSetCashRegisterModificationUnit()) {
+            return Optional.empty();
+        }
+
+        CashRegisterModificationUnit cashRegisterModificationUnit = shopModification.getCashRegisterModificationUnit();
+        builder.id(cashRegisterModificationUnit.getId());
+
+        return findInCreationModification(cashRegisterModificationUnit.getModification(), builder);
+    }
+
+    @SneakyThrows
+    private Optional<CashRegister> findInCreationModification(
+            CashRegisterModification cashRegisterModification,
+            CashRegister.CashRegisterBuilder builder) {
+        if (!cashRegisterModification.isSetCreation()) {
+            return Optional.empty();
+        }
+
+        CashRegisterParams cashRegisterParams = cashRegisterModification.getCreation();
+        builder.providerId(cashRegisterParams.getCashRegisterProviderId());
+        builder.providerParams(objectMapper.writeValueAsString(cashRegisterParams.getCashRegisterProviderParams()));
+
+        return Optional.ofNullable(builder.build());
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.cashier.domain.CashRegister;
 import com.rbkmoney.cashier.repository.CashRegisterRepository;
 import com.rbkmoney.damsel.claim_management.*;
+import com.rbkmoney.damsel.domain.CategoryRef;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -62,5 +63,55 @@ public class ClaimCommitterServerHandlerTest {
                 .build();
 
         assertThat(cashRegister).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldHandleClaimWithNoPartyModification() {
+        // Given
+        Claim claim = new Claim()
+                .setChangeset(List.of(new ModificationUnit()
+                        .setModification(Modification.claim_modification(new ClaimModification()))));
+
+        // When
+        claimCommitterServerHandler.commit("party-id", claim);
+
+        // Then
+        verify(cashRegisterRepository, never())
+                .save(any());
+    }
+
+    @Test
+    public void shouldHandleClaimWithNoShopModification() {
+        // Given
+        Claim claim = new Claim()
+                .setChangeset(List.of(new ModificationUnit()
+                        .setModification(Modification.party_modification(
+                                PartyModification.contract_modification(new ContractModificationUnit())))));
+
+        // When
+        claimCommitterServerHandler.commit("party-id", claim);
+
+        // Then
+        verify(cashRegisterRepository, never())
+                .save(any());
+    }
+
+    @Test
+    public void shouldHandleClaimWithNoCashRegisterModification() {
+        // Given
+        Claim claim = new Claim()
+                .setChangeset(List.of(new ModificationUnit()
+                        .setModification(Modification.party_modification(
+                                PartyModification.shop_modification(new ShopModificationUnit()
+                                        .setId("shop-id")
+                                        .setModification(
+                                                ShopModification.category_modification(new CategoryRef())))))));
+
+        // When
+        claimCommitterServerHandler.commit("party-id", claim);
+
+        // Then
+        verify(cashRegisterRepository, never())
+                .save(any());
     }
 }
