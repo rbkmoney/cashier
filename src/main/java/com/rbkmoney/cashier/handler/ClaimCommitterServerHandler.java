@@ -86,6 +86,6 @@ public class ClaimCommitterServerHandler implements ClaimCommitterSrv.Iface {
         builder.providerId(cashRegisterParams.getCashRegisterProviderId());
         builder.providerParams(objectMapper.writeValueAsString(cashRegisterParams.getCashRegisterProviderParams()));
 
-        return Optional.ofNullable(builder.build());
+        return Optional.of(builder.build());
     }
 }
