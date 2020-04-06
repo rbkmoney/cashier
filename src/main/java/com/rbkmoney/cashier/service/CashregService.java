@@ -22,16 +22,16 @@ public class CashregService {
 
     public void send(ReceiptParams... receipts) {
         if (!isReceiptsSendingEnabled) {
-            log.debug("Sending receipts to cashreg is disabled!");
+            log.warn("Sending receipts to cashreg is disabled!");
             return;
         }
 
         for (ReceiptParams receipt : receipts) {
             try {
-                log.debug("Sending receipt={} to cashreg...", receipt);
+                log.info("Sending receipt={} to cashreg...", receipt.getReceiptId());
                 cashregClient.create(receipt);
             } catch (TException e) {
-                log.error("CashregClient exception for receipt={}: ", receipt, e);
+                log.error("CashregClient exception for receipt={}: ", receipt.getReceiptId(), e);
             }
         }
     }

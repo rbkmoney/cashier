@@ -141,7 +141,7 @@ public class ReceiptFactory {
                                 .setCash(cash)
                                 .setCart(new Cart(items)));
 
-        log.debug("New receipt created={}", receipt);
+        log.info("New receipt created={}", receipt);
         return receipt;
     }
 
