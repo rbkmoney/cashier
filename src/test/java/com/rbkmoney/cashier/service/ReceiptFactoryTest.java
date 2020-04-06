@@ -1,6 +1,6 @@
 package com.rbkmoney.cashier.service;
 
-import com.rbkmoney.damsel.cashreg.processing.ManagementSrv;
+import com.rbkmoney.cashier.mapper.CashRegisterMapper;
 import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
 import com.rbkmoney.damsel.cashreg.receipt.ItemsLine;
 import com.rbkmoney.damsel.cashreg.receipt.type.Debit;
@@ -9,7 +9,6 @@ import com.rbkmoney.damsel.cashreg.receipt.type.Type;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.Invoice;
 import com.rbkmoney.damsel.payment_processing.InvoicePayment;
-import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,44 +20,29 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CashregServiceTest {
+public class ReceiptFactoryTest {
 
     @Mock
     private CartTransformer cartTransformer;
     @Mock
     private EmailExtractor emailExtractor;
     @Mock
-    private ManagementSrv.Iface cashregClient;
+    private CashRegisterMapper cashRegisterMapper;
 
     @InjectMocks
-    private CashregService cashregService;
+    private ReceiptFactory receiptFactory;
 
     @Before
     public void setUp() {
-        cashregService.setReceiptsSendingEnabled(true);
-
         when(cartTransformer.transform(any()))
                 .thenReturn(List.of(new ItemsLine()));
         when(emailExtractor.extract(any()))
                 .thenReturn("email");
     }
-
-    @Test
-    public void shouldSendReceipts() throws TException {
-        // Given - When
-        cashregService.send(
-                new ReceiptParams(),
-                new ReceiptParams(),
-                new ReceiptParams());
-
-        // Then
-        verify(cashregClient, times(3))
-                .create(any());
-    }
-
+    
     @Test
     public void shouldCreateDebitReceiptForInvoice() {
         // Given
@@ -78,7 +62,7 @@ public class CashregServiceTest {
                                 .setId("paymentId"))));
 
         // When
-        ReceiptParams receipt = cashregService.debitForInvoice(
+        ReceiptParams receipt = receiptFactory.debitForInvoice(
                 List.of(),
                 aggregate);
 
@@ -118,7 +102,7 @@ public class CashregServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        ReceiptParams receipt = cashregService.debitForPartialCapture(
+        ReceiptParams receipt = receiptFactory.debitForPartialCapture(
                 List.of(),
                 aggregate,
                 capturedPayment);
@@ -164,7 +148,7 @@ public class CashregServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        ReceiptParams receipt = cashregService.debitForPartialRefund(
+        ReceiptParams receipt = receiptFactory.debitForPartialRefund(
                 List.of(),
                 aggregate,
                 refund);
@@ -198,7 +182,7 @@ public class CashregServiceTest {
                                 .setId("paymentId"))));
 
         // When
-        ReceiptParams receipt = cashregService.refundDebitForInvoice(
+        ReceiptParams receipt = receiptFactory.refundDebitForInvoice(
                 List.of(),
                 aggregate);
 
@@ -243,7 +227,7 @@ public class CashregServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        ReceiptParams receipt = cashregService.refundDebitForPreviousPartialRefund(
+        ReceiptParams receipt = receiptFactory.refundDebitForPreviousPartialRefund(
                 List.of(),
                 aggregate,
                 refund);

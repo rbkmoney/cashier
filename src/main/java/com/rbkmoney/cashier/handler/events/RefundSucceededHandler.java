@@ -6,6 +6,7 @@ import com.rbkmoney.cashier.handler.events.iface.AbstractEventHandler;
 import com.rbkmoney.cashier.repository.CashRegisterRepository;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
 import com.rbkmoney.cashier.service.CashregService;
+import com.rbkmoney.cashier.service.ReceiptFactory;
 import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
 import com.rbkmoney.damsel.payment_processing.Invoice;
@@ -24,17 +25,20 @@ public class RefundSucceededHandler extends AbstractEventHandler {
 
     private final InvoiceAggregateRepository invoiceAggregateRepository;
     private final CashRegisterRepository cashRegisterRepository;
-    private final CashregService cashRegService;
+    private final ReceiptFactory receiptFactory;
+    private final CashregService cashregService;
 
     public RefundSucceededHandler(
             @Value("${events.path.refund-succeeded}") String path,
             InvoiceAggregateRepository invoiceAggregateRepository,
             CashRegisterRepository cashRegisterRepository,
-            CashregService cashRegService) {
+            ReceiptFactory receiptFactory,
+            CashregService cashregService) {
         super(path);
         this.invoiceAggregateRepository = invoiceAggregateRepository;
         this.cashRegisterRepository = cashRegisterRepository;
-        this.cashRegService = cashRegService;
+        this.receiptFactory = receiptFactory;
+        this.cashregService = cashregService;
     }
 
     @Override
@@ -66,20 +70,20 @@ public class RefundSucceededHandler extends AbstractEventHandler {
 
         if (currentPartialRefund.isPresent()) {
             log.debug("Current refund is partial");
-            ReceiptParams debitForPartialRefund = cashRegService.debitForPartialRefund(
+            ReceiptParams debitForPartialRefund = receiptFactory.debitForPartialRefund(
                     cashRegisters,
                     aggregate,
                     currentPartialRefund.get());
 
-            cashRegService.send(debitForPartialRefund);
+            cashregService.send(debitForPartialRefund);
         } else {
             log.debug("Current refund is NOT partial");
         }
 
         ReceiptParams refundDebit = refundDebitForPreviousPartialRefund(cashRegisters, aggregate, currentRefundId)
-                .orElse(cashRegService.refundDebitForInvoice(cashRegisters, aggregate));
+                .orElse(receiptFactory.refundDebitForInvoice(cashRegisters, aggregate));
 
-        cashRegService.send(refundDebit);
+        cashregService.send(refundDebit);
 
         log.debug("Finished handling RefundSucceeded event: invoiceId={}, eventId={}", invoiceId, eventId);
     }
@@ -110,7 +114,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
 
         log.debug("Previous successful partial refund was found");
         return Optional.of(
-                cashRegService.refundDebitForPreviousPartialRefund(
+                receiptFactory.refundDebitForPreviousPartialRefund(
                         cashRegisters,
                         aggregate,
                         previousPartialRefund.get()));

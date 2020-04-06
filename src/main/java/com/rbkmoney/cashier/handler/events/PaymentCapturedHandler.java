@@ -6,6 +6,7 @@ import com.rbkmoney.cashier.handler.events.iface.AbstractEventHandler;
 import com.rbkmoney.cashier.repository.CashRegisterRepository;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
 import com.rbkmoney.cashier.service.CashregService;
+import com.rbkmoney.cashier.service.ReceiptFactory;
 import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
 import com.rbkmoney.damsel.domain.InvoicePaymentCaptured;
 import com.rbkmoney.damsel.payment_processing.Invoice;
@@ -21,17 +22,20 @@ public class PaymentCapturedHandler extends AbstractEventHandler {
 
     private final InvoiceAggregateRepository invoiceAggregateRepository;
     private final CashRegisterRepository cashRegisterRepository;
-    private final CashregService cashRegService;
+    private final ReceiptFactory receiptFactory;
+    private final CashregService cashregService;
 
     public PaymentCapturedHandler(
             @Value("${events.path.payment-captured}") String path,
             InvoiceAggregateRepository invoiceAggregateRepository,
             CashRegisterRepository cashRegisterRepository,
-            CashregService cashRegService) {
+            ReceiptFactory receiptFactory,
+            CashregService cashregService) {
         super(path);
         this.invoiceAggregateRepository = invoiceAggregateRepository;
         this.cashRegisterRepository = cashRegisterRepository;
-        this.cashRegService = cashRegService;
+        this.receiptFactory = receiptFactory;
+        this.cashregService = cashregService;
     }
 
     @Override
@@ -63,16 +67,16 @@ public class PaymentCapturedHandler extends AbstractEventHandler {
                 aggregate.getInvoice().getOwnerId(),
                 aggregate.getInvoice().getShopId());
 
-        ReceiptParams refundDebitForInvoice = cashRegService.refundDebitForInvoice(
+        ReceiptParams refundDebitForInvoice = receiptFactory.refundDebitForInvoice(
                 cashRegisters,
                 aggregate);
 
-        ReceiptParams debitForPartialCapture = cashRegService.debitForPartialCapture(
+        ReceiptParams debitForPartialCapture = receiptFactory.debitForPartialCapture(
                 cashRegisters,
                 aggregate,
                 capturedPayment);
 
-        cashRegService.send(
+        cashregService.send(
                 refundDebitForInvoice,
                 debitForPartialCapture);
 
