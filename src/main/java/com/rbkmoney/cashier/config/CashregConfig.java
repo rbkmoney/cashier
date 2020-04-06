@@ -10,7 +10,7 @@ import org.springframework.core.io.Resource;
 import java.io.IOException;
 
 @Configuration
-public class CashRegConfig {
+public class CashregConfig {
 
     @Bean
     public ManagementSrv.Iface cashregClient(
