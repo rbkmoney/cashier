@@ -1,10 +1,10 @@
 package com.rbkmoney.cashier.handler.events;
 
 import com.rbkmoney.cashier.domain.InvoiceChangeWithMetadata;
+import com.rbkmoney.cashier.repository.CashRegisterRepository;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
-import com.rbkmoney.cashier.repository.ProviderRepository;
-import com.rbkmoney.cashier.service.CashRegService;
-import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
+import com.rbkmoney.cashier.service.CashregService;
+import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
 import com.rbkmoney.damsel.domain.InvoiceCart;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefundStatus;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefundSucceeded;
@@ -19,24 +19,24 @@ import static org.mockito.Mockito.*;
 public class RefundSucceededHandlerTest {
 
     private InvoiceAggregateRepository invoiceAggregateRepository;
-    private CashRegService cashRegService;
+    private CashregService cashregService;
 
     private RefundSucceededHandler handler;
 
     @Before
     public void setUp() {
         invoiceAggregateRepository = mock(InvoiceAggregateRepository.class);
-        cashRegService = mock(CashRegService.class);
-        ProviderRepository providerRepository = mock(ProviderRepository.class);
+        cashregService = mock(CashregService.class);
+        CashRegisterRepository cashRegisterRepository = mock(CashRegisterRepository.class);
 
-        when(providerRepository.findBy())
-                .thenReturn("providerId");
+        when(cashRegisterRepository.findByPartyIdAndShopId(anyString(), anyString()))
+                .thenReturn(List.of());
 
         handler = new RefundSucceededHandler(
                 "",
                 invoiceAggregateRepository,
-                providerRepository,
-                cashRegService);
+                cashRegisterRepository,
+                cashregService);
     }
 
     @Test
@@ -69,9 +69,9 @@ public class RefundSucceededHandlerTest {
         handler.handle(invoiceChangeWithMetadata);
 
         // Then
-        verify(cashRegService, times(1))
+        verify(cashregService, times(1))
                 .refundDebitForInvoice(any(), any());
-        verify(cashRegService, times(1))
+        verify(cashregService, times(1))
                 .send(any());
     }
 
@@ -105,8 +105,8 @@ public class RefundSucceededHandlerTest {
                                         .setRefund(new com.rbkmoney.damsel.domain.InvoicePaymentRefund()
                                                 .setId("refundId"))))));
 
-        when(cashRegService.refundDebitForPreviousPartialRefund(any(), any(), any()))
-                .thenReturn(new CashRegParams());
+        when(cashregService.refundDebitForPreviousPartialRefund(any(), any(), any()))
+                .thenReturn(new ReceiptParams());
         when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
 
@@ -114,9 +114,9 @@ public class RefundSucceededHandlerTest {
         handler.handle(invoiceChangeWithMetadata);
 
         // Then
-        verify(cashRegService, times(1))
+        verify(cashregService, times(1))
                 .refundDebitForPreviousPartialRefund(any(), any(), any());
-        verify(cashRegService, times(1))
+        verify(cashregService, times(1))
                 .send(any());
     }
 
@@ -151,11 +151,11 @@ public class RefundSucceededHandlerTest {
         handler.handle(invoiceChangeWithMetadata);
 
         // Then
-        verify(cashRegService, times(1))
+        verify(cashregService, times(1))
                 .refundDebitForInvoice(any(), any());
-        verify(cashRegService, times(1))
+        verify(cashregService, times(1))
                 .debitForPartialRefund(any(), any(), any());
-        verify(cashRegService, times(2))
+        verify(cashregService, times(2))
                 .send(any());
     }
 }

@@ -1,11 +1,11 @@
 package com.rbkmoney.cashier.service;
 
-import com.rbkmoney.damsel.cashreg.ItemsLine;
-import com.rbkmoney.damsel.cashreg.type.Debit;
-import com.rbkmoney.damsel.cashreg.type.RefundDebit;
-import com.rbkmoney.damsel.cashreg.type.Type;
-import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
-import com.rbkmoney.damsel.cashreg_processing.ManagementSrv;
+import com.rbkmoney.damsel.cashreg.processing.ManagementSrv;
+import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
+import com.rbkmoney.damsel.cashreg.receipt.ItemsLine;
+import com.rbkmoney.damsel.cashreg.receipt.type.Debit;
+import com.rbkmoney.damsel.cashreg.receipt.type.RefundDebit;
+import com.rbkmoney.damsel.cashreg.receipt.type.Type;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.Invoice;
 import com.rbkmoney.damsel.payment_processing.InvoicePayment;
@@ -24,21 +24,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CashRegServiceTest {
+public class CashregServiceTest {
 
     @Mock
     private CartTransformer cartTransformer;
     @Mock
     private EmailExtractor emailExtractor;
     @Mock
-    private ManagementSrv.Iface cashRegClient;
+    private ManagementSrv.Iface cashregClient;
 
     @InjectMocks
-    private CashRegService cashRegService;
+    private CashregService cashregService;
 
     @Before
     public void setUp() {
-        cashRegService.setReceiptsSendingEnabled(true);
+        cashregService.setReceiptsSendingEnabled(true);
 
         when(cartTransformer.transform(any()))
                 .thenReturn(List.of(new ItemsLine()));
@@ -49,13 +49,13 @@ public class CashRegServiceTest {
     @Test
     public void shouldSendReceipts() throws TException {
         // Given - When
-        cashRegService.send(
-                new CashRegParams(),
-                new CashRegParams(),
-                new CashRegParams());
+        cashregService.send(
+                new ReceiptParams(),
+                new ReceiptParams(),
+                new ReceiptParams());
 
         // Then
-        verify(cashRegClient, times(3))
+        verify(cashregClient, times(3))
                 .create(any());
     }
 
@@ -78,8 +78,8 @@ public class CashRegServiceTest {
                                 .setId("paymentId"))));
 
         // When
-        CashRegParams receipt = cashRegService.debitForInvoice(
-                "providerId",
+        ReceiptParams receipt = cashregService.debitForInvoice(
+                List.of(),
                 aggregate);
 
         // Then
@@ -118,8 +118,8 @@ public class CashRegServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        CashRegParams receipt = cashRegService.debitForPartialCapture(
-                "providerId",
+        ReceiptParams receipt = cashregService.debitForPartialCapture(
+                List.of(),
                 aggregate,
                 capturedPayment);
 
@@ -164,8 +164,8 @@ public class CashRegServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        CashRegParams receipt = cashRegService.debitForPartialRefund(
-                "providerId",
+        ReceiptParams receipt = cashregService.debitForPartialRefund(
+                List.of(),
                 aggregate,
                 refund);
 
@@ -198,8 +198,8 @@ public class CashRegServiceTest {
                                 .setId("paymentId"))));
 
         // When
-        CashRegParams receipt = cashRegService.refundDebitForInvoice(
-                "providerId",
+        ReceiptParams receipt = cashregService.refundDebitForInvoice(
+                List.of(),
                 aggregate);
 
         // Then
@@ -243,8 +243,8 @@ public class CashRegServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        CashRegParams receipt = cashRegService.refundDebitForPreviousPartialRefund(
-                "providerId",
+        ReceiptParams receipt = cashregService.refundDebitForPreviousPartialRefund(
+                List.of(),
                 aggregate,
                 refund);
 

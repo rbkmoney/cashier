@@ -1,13 +1,14 @@
 package com.rbkmoney.cashier.service;
 
-import com.rbkmoney.damsel.cashreg.Cart;
-import com.rbkmoney.damsel.cashreg.ItemsLine;
-import com.rbkmoney.damsel.cashreg.type.Debit;
-import com.rbkmoney.damsel.cashreg.type.RefundDebit;
-import com.rbkmoney.damsel.cashreg.type.Type;
-import com.rbkmoney.damsel.cashreg_domain.PaymentInfo;
-import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
-import com.rbkmoney.damsel.cashreg_processing.ManagementSrv;
+import com.rbkmoney.cashier.domain.CashRegister;
+import com.rbkmoney.damsel.cashreg.domain.PaymentInfo;
+import com.rbkmoney.damsel.cashreg.processing.ManagementSrv;
+import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
+import com.rbkmoney.damsel.cashreg.receipt.Cart;
+import com.rbkmoney.damsel.cashreg.receipt.ItemsLine;
+import com.rbkmoney.damsel.cashreg.receipt.type.Debit;
+import com.rbkmoney.damsel.cashreg.receipt.type.RefundDebit;
+import com.rbkmoney.damsel.cashreg.receipt.type.Type;
 import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.CurrencyRef;
 import com.rbkmoney.damsel.domain.InvoicePaymentCaptured;
@@ -27,34 +28,34 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CashRegService {
+public class CashregService {
 
     @Setter
-    @Value("${client.cash-reg.enabled}")
+    @Value("${client.cashreg.enabled}")
     private boolean isReceiptsSendingEnabled;
 
     private final CartTransformer cartTransformer;
     private final EmailExtractor emailExtractor;
-    private final ManagementSrv.Iface cashRegClient;
+    private final ManagementSrv.Iface cashregClient;
 
-    public void send(CashRegParams... receipts) {
+    public void send(ReceiptParams... receipts) {
         if (!isReceiptsSendingEnabled) {
-            log.debug("Sending receipts to cashReg is disabled!");
+            log.debug("Sending receipts to cashreg is disabled!");
             return;
         }
 
-        for (CashRegParams receipt : receipts) {
+        for (ReceiptParams receipt : receipts) {
             try {
-                log.debug("Sending receipt={} to cashReg...", receipt);
-                cashRegClient.create(receipt);
+                log.debug("Sending receipt={} to cashreg...", receipt);
+                cashregClient.create(receipt);
             } catch (TException e) {
-                log.error("CashRegClient exception for receipt={}: ", receipt, e);
+                log.error("CashregClient exception for receipt={}: ", receipt, e);
             }
         }
     }
 
-    public CashRegParams debitForInvoice(
-            String providerId,
+    public ReceiptParams debitForInvoice(
+            List<CashRegister> cashRegisters,
             Invoice aggregate) {
         log.debug("Creating new DEBIT receipt for invoice...");
 
@@ -62,15 +63,15 @@ public class CashRegService {
         List<ItemsLine> items = cartTransformer.transform(aggregate.getInvoice().getDetails().getCart());
 
         return receipt(
-                providerId,
+                cashRegisters,
                 aggregate,
                 Type.debit(new Debit()),
                 cash,
                 items);
     }
 
-    public CashRegParams debitForPartialCapture(
-            String providerId,
+    public ReceiptParams debitForPartialCapture(
+            List<CashRegister> cashRegisters,
             Invoice aggregate,
             InvoicePaymentCaptured capturedPayment) {
         log.debug("Creating new DEBIT receipt for partial capture...");
@@ -79,15 +80,15 @@ public class CashRegService {
         List<ItemsLine> items = cartTransformer.transform(capturedPayment.getCart());
 
         return receipt(
-                providerId,
+                cashRegisters,
                 aggregate,
                 Type.debit(new Debit()),
                 cash,
                 items);
     }
 
-    public CashRegParams debitForPartialRefund(
-            String providerId,
+    public ReceiptParams debitForPartialRefund(
+            List<CashRegister> cashRegisters,
             Invoice aggregate,
             InvoicePaymentRefund refund) {
         log.debug("Creating new DEBIT receipt for partial refund...");
@@ -96,15 +97,15 @@ public class CashRegService {
         List<ItemsLine> items = cartTransformer.transform(refund.getCart());
 
         return receipt(
-                providerId,
+                cashRegisters,
                 aggregate,
                 Type.debit(new Debit()),
                 cash,
                 items);
     }
 
-    public CashRegParams refundDebitForInvoice(
-            String providerId,
+    public ReceiptParams refundDebitForInvoice(
+            List<CashRegister> cashRegisters,
             Invoice aggregate) {
         log.debug("Creating new REFUND_DEBIT receipt for invoice...");
 
@@ -112,15 +113,15 @@ public class CashRegService {
         List<ItemsLine> items = cartTransformer.transform(aggregate.getInvoice().getDetails().getCart());
 
         return receipt(
-                providerId,
+                cashRegisters,
                 aggregate,
                 Type.refund_debit(new RefundDebit()),
                 cash,
                 items);
     }
 
-    public CashRegParams refundDebitForPreviousPartialRefund(
-            String providerId,
+    public ReceiptParams refundDebitForPreviousPartialRefund(
+            List<CashRegister> cashRegisters,
             Invoice aggregate,
             InvoicePaymentRefund refund) {
         log.debug("Creating new REFUND_DEBIT receipt for previous partial refund...");
@@ -129,15 +130,15 @@ public class CashRegService {
         List<ItemsLine> items = cartTransformer.transform(refund.getCart());
 
         return receipt(
-                providerId,
+                cashRegisters,
                 aggregate,
                 Type.refund_debit(new RefundDebit()),
                 cash,
                 items);
     }
 
-    private CashRegParams receipt(
-            String providerId,
+    private ReceiptParams receipt(
+            List<CashRegister> cashRegisters,
             Invoice aggregate,
             Type type,
             Cash cash,
@@ -151,12 +152,12 @@ public class CashRegService {
         String shopId = invoice.getShopId();
         String email = emailExtractor.extract(payments);
 
-        CashRegParams receipt = new CashRegParams()
-                .setCashregId(id)
-                .setCashregProviderId(providerId)
+        ReceiptParams receipt = new ReceiptParams()
+                .setReceiptId(id)
                 .setPartyId(partyId)
                 .setShopId(shopId)
                 .setType(type)
+                .setProviders(List.of()) // TODO [a.romanov]: map
                 .setPaymentInfo(
                         new PaymentInfo()
                                 .setEmail(email)
@@ -188,7 +189,7 @@ public class CashRegService {
                 .getCart()
                 .getLines()
                 .stream()
-                .mapToLong(line -> line.getPrice().getAmount())
+                .mapToLong(item -> item.getPrice().getAmount())
                 .sum();
 
         return new Cash(amount, currency);

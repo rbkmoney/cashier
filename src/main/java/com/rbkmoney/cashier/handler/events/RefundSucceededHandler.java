@@ -1,11 +1,12 @@
 package com.rbkmoney.cashier.handler.events;
 
+import com.rbkmoney.cashier.domain.CashRegister;
 import com.rbkmoney.cashier.domain.InvoiceChangeWithMetadata;
 import com.rbkmoney.cashier.handler.events.iface.AbstractEventHandler;
+import com.rbkmoney.cashier.repository.CashRegisterRepository;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
-import com.rbkmoney.cashier.repository.ProviderRepository;
-import com.rbkmoney.cashier.service.CashRegService;
-import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
+import com.rbkmoney.cashier.service.CashregService;
+import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
 import com.rbkmoney.damsel.payment_processing.Invoice;
 import com.rbkmoney.damsel.payment_processing.InvoicePayment;
@@ -22,17 +23,17 @@ import java.util.stream.Stream;
 public class RefundSucceededHandler extends AbstractEventHandler {
 
     private final InvoiceAggregateRepository invoiceAggregateRepository;
-    private final ProviderRepository providerRepository;
-    private final CashRegService cashRegService;
+    private final CashRegisterRepository cashRegisterRepository;
+    private final CashregService cashRegService;
 
     public RefundSucceededHandler(
             @Value("${events.path.refund-succeeded}") String path,
             InvoiceAggregateRepository invoiceAggregateRepository,
-            ProviderRepository providerRepository,
-            CashRegService cashRegService) {
+            CashRegisterRepository cashRegisterRepository,
+            CashregService cashRegService) {
         super(path);
         this.invoiceAggregateRepository = invoiceAggregateRepository;
-        this.providerRepository = providerRepository;
+        this.cashRegisterRepository = cashRegisterRepository;
         this.cashRegService = cashRegService;
     }
 
@@ -47,7 +48,9 @@ public class RefundSucceededHandler extends AbstractEventHandler {
                 invoiceId,
                 eventId);
 
-        String providerId = providerRepository.findBy();
+        List<CashRegister> cashRegisters = cashRegisterRepository.findByPartyIdAndShopId(
+                aggregate.getInvoice().getOwnerId(),
+                aggregate.getInvoice().getShopId());
 
         String currentRefundId = invoiceChangeWithMetadata
                 .getInvoiceChange()
@@ -63,8 +66,8 @@ public class RefundSucceededHandler extends AbstractEventHandler {
 
         if (currentPartialRefund.isPresent()) {
             log.debug("Current refund is partial");
-            CashRegParams debitForPartialRefund = cashRegService.debitForPartialRefund(
-                    providerId,
+            ReceiptParams debitForPartialRefund = cashRegService.debitForPartialRefund(
+                    cashRegisters,
                     aggregate,
                     currentPartialRefund.get());
 
@@ -73,16 +76,16 @@ public class RefundSucceededHandler extends AbstractEventHandler {
             log.debug("Current refund is NOT partial");
         }
 
-        CashRegParams refundDebit = refundDebitForPreviousPartialRefund(providerId, aggregate, currentRefundId)
-                .orElse(cashRegService.refundDebitForInvoice(providerId, aggregate));
+        ReceiptParams refundDebit = refundDebitForPreviousPartialRefund(cashRegisters, aggregate, currentRefundId)
+                .orElse(cashRegService.refundDebitForInvoice(cashRegisters, aggregate));
 
         cashRegService.send(refundDebit);
 
         log.debug("Finished handling RefundSucceeded event: invoiceId={}, eventId={}", invoiceId, eventId);
     }
 
-    private Optional<CashRegParams> refundDebitForPreviousPartialRefund(
-            String providerId,
+    private Optional<ReceiptParams> refundDebitForPreviousPartialRefund(
+            List<CashRegister> cashRegisters,
             Invoice aggregate,
             String currentRefundId) {
         log.debug("Looking for previous successful refunds...");
@@ -108,7 +111,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
         log.debug("Previous successful partial refund was found");
         return Optional.of(
                 cashRegService.refundDebitForPreviousPartialRefund(
-                        providerId,
+                        cashRegisters,
                         aggregate,
                         previousPartialRefund.get()));
     }
