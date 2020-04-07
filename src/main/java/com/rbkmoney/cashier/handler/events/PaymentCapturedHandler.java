@@ -69,11 +69,13 @@ public class PaymentCapturedHandler extends AbstractEventHandler {
 
         ReceiptParams refundDebitForInvoice = receiptFactory.refundDebitForInvoice(
                 cashRegisters,
-                aggregate);
+                aggregate,
+                eventId);
 
         ReceiptParams debitForPartialCapture = receiptFactory.debitForPartialCapture(
                 cashRegisters,
                 aggregate,
+                eventId,
                 capturedPayment);
 
         cashregService.send(

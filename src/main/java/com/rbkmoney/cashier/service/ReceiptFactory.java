@@ -20,12 +20,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReceiptFactory {
+
+    private static final String DEBIT = "debit";
+    private static final String CREDIT = "credit";
+    private static final String REFUND_DEBIT = "refund-debit";
+    private static final String REFUND_CREDIT = "refund-credit";
 
     private final CartTransformer cartTransformer;
     private final EmailExtractor emailExtractor;
@@ -33,7 +37,8 @@ public class ReceiptFactory {
 
     public ReceiptParams debitForInvoice(
             List<CashRegister> cashRegisters,
-            Invoice aggregate) {
+            Invoice aggregate,
+            long eventId) {
         log.debug("Creating new DEBIT receipt for invoice...");
 
         Cash cash = aggregate.getInvoice().getCost();
@@ -42,6 +47,7 @@ public class ReceiptFactory {
         return receipt(
                 cashRegisters,
                 aggregate,
+                eventId,
                 Type.debit(new Debit()),
                 cash,
                 items);
@@ -50,6 +56,7 @@ public class ReceiptFactory {
     public ReceiptParams debitForPartialCapture(
             List<CashRegister> cashRegisters,
             Invoice aggregate,
+            long eventId,
             InvoicePaymentCaptured capturedPayment) {
         log.debug("Creating new DEBIT receipt for partial capture...");
 
@@ -59,6 +66,7 @@ public class ReceiptFactory {
         return receipt(
                 cashRegisters,
                 aggregate,
+                eventId,
                 Type.debit(new Debit()),
                 cash,
                 items);
@@ -67,6 +75,7 @@ public class ReceiptFactory {
     public ReceiptParams debitForPartialRefund(
             List<CashRegister> cashRegisters,
             Invoice aggregate,
+            long eventId,
             InvoicePaymentRefund refund) {
         log.debug("Creating new DEBIT receipt for partial refund...");
 
@@ -76,6 +85,7 @@ public class ReceiptFactory {
         return receipt(
                 cashRegisters,
                 aggregate,
+                eventId,
                 Type.debit(new Debit()),
                 cash,
                 items);
@@ -83,7 +93,8 @@ public class ReceiptFactory {
 
     public ReceiptParams refundDebitForInvoice(
             List<CashRegister> cashRegisters,
-            Invoice aggregate) {
+            Invoice aggregate,
+            long eventId) {
         log.debug("Creating new REFUND_DEBIT receipt for invoice...");
 
         Cash cash = aggregate.getInvoice().getCost();
@@ -92,6 +103,7 @@ public class ReceiptFactory {
         return receipt(
                 cashRegisters,
                 aggregate,
+                eventId,
                 Type.refund_debit(new RefundDebit()),
                 cash,
                 items);
@@ -100,6 +112,7 @@ public class ReceiptFactory {
     public ReceiptParams refundDebitForPreviousPartialRefund(
             List<CashRegister> cashRegisters,
             Invoice aggregate,
+            long eventId,
             InvoicePaymentRefund refund) {
         log.debug("Creating new REFUND_DEBIT receipt for previous partial refund...");
 
@@ -109,6 +122,7 @@ public class ReceiptFactory {
         return receipt(
                 cashRegisters,
                 aggregate,
+                eventId,
                 Type.refund_debit(new RefundDebit()),
                 cash,
                 items);
@@ -117,13 +131,14 @@ public class ReceiptFactory {
     private ReceiptParams receipt(
             List<CashRegister> cashRegisters,
             Invoice aggregate,
+            long eventId,
             Type type,
             Cash cash,
             List<ItemsLine> items) {
         com.rbkmoney.damsel.domain.Invoice invoice = aggregate.getInvoice();
         List<InvoicePayment> payments = aggregate.getPayments();
 
-        String id = receiptId(invoice, payments);
+        String id = receiptId(invoice.getId(), eventId, type);
 
         String partyId = invoice.getOwnerId();
         String shopId = invoice.getShopId();
@@ -146,12 +161,22 @@ public class ReceiptFactory {
     }
 
     private String receiptId(
-            com.rbkmoney.damsel.domain.Invoice invoice,
-            List<InvoicePayment> payments) {
+            String invoiceId,
+            long eventId,
+            Type type) {
         return String.format("%s.%s.%s",
-                invoice.getId(),
-                payments.get(payments.size() - 1).getPayment().getId(),
-                UUID.randomUUID());
+                invoiceId,
+                eventId,
+                typeString(type));
+    }
+
+    private String typeString(Type type) {
+        if (type.isSetCredit()) return CREDIT;
+        if (type.isSetDebit()) return DEBIT;
+        if (type.isSetRefundCredit()) return REFUND_CREDIT;
+        if (type.isSetRefundDebit()) return REFUND_DEBIT;
+
+        throw new IllegalArgumentException("Unknown receipt type: " + type);
     }
 
     private Cash cashForPartialRefund(

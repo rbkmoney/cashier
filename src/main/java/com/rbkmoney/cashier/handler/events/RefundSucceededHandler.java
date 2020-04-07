@@ -73,6 +73,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
             ReceiptParams debitForPartialRefund = receiptFactory.debitForPartialRefund(
                     cashRegisters,
                     aggregate,
+                    eventId,
                     currentPartialRefund.get());
 
             cashregService.send(debitForPartialRefund);
@@ -80,8 +81,8 @@ public class RefundSucceededHandler extends AbstractEventHandler {
             log.debug("Current refund is NOT partial");
         }
 
-        ReceiptParams refundDebit = refundDebitForPreviousPartialRefund(cashRegisters, aggregate, currentRefundId)
-                .orElse(receiptFactory.refundDebitForInvoice(cashRegisters, aggregate));
+        ReceiptParams refundDebit = refundDebitForPreviousPartialRefund(cashRegisters, aggregate, eventId, currentRefundId)
+                .orElse(receiptFactory.refundDebitForInvoice(cashRegisters, aggregate, eventId));
 
         cashregService.send(refundDebit);
 
@@ -91,6 +92,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
     private Optional<ReceiptParams> refundDebitForPreviousPartialRefund(
             List<CashRegister> cashRegisters,
             Invoice aggregate,
+            long eventId,
             String currentRefundId) {
         log.debug("Looking for previous successful refunds...");
         List<InvoicePayment> payments = aggregate.getPayments();
@@ -117,6 +119,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
                 receiptFactory.refundDebitForPreviousPartialRefund(
                         cashRegisters,
                         aggregate,
+                        eventId,
                         previousPartialRefund.get()));
     }
 

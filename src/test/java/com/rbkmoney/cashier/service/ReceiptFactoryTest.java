@@ -64,9 +64,11 @@ public class ReceiptFactoryTest {
         // When
         ReceiptParams receipt = receiptFactory.debitForInvoice(
                 List.of(),
-                aggregate);
+                aggregate,
+                1L);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.debit(new Debit()));
@@ -105,9 +107,11 @@ public class ReceiptFactoryTest {
         ReceiptParams receipt = receiptFactory.debitForPartialCapture(
                 List.of(),
                 aggregate,
+                1L,
                 capturedPayment);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.debit(new Debit()));
@@ -151,9 +155,11 @@ public class ReceiptFactoryTest {
         ReceiptParams receipt = receiptFactory.debitForPartialRefund(
                 List.of(),
                 aggregate,
+                1L,
                 refund);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.debit(new Debit()));
@@ -184,9 +190,11 @@ public class ReceiptFactoryTest {
         // When
         ReceiptParams receipt = receiptFactory.refundDebitForInvoice(
                 List.of(),
-                aggregate);
+                aggregate,
+                1L);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.refund-debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.refund_debit(new RefundDebit()));
@@ -230,9 +238,11 @@ public class ReceiptFactoryTest {
         ReceiptParams receipt = receiptFactory.refundDebitForPreviousPartialRefund(
                 List.of(),
                 aggregate,
+                1L,
                 refund);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.refund-debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.refund_debit(new RefundDebit()));

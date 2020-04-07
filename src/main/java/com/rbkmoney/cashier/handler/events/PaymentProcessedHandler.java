@@ -54,7 +54,8 @@ public class PaymentProcessedHandler extends AbstractEventHandler {
 
         ReceiptParams debitForInvoice = receiptFactory.debitForInvoice(
                 cashRegisters,
-                aggregate);
+                aggregate,
+                eventId);
 
         cashregService.send(debitForInvoice);
 

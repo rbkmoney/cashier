@@ -54,7 +54,8 @@ public class PaymentFailedHandler extends AbstractEventHandler {
 
         ReceiptParams refundDebitForInvoice = receiptFactory.refundDebitForInvoice(
                 cashRegisters,
-                aggregate);
+                aggregate,
+                eventId);
 
         cashregService.send(refundDebitForInvoice);
 

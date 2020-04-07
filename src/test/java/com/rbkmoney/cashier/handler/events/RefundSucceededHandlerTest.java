@@ -74,7 +74,7 @@ public class RefundSucceededHandlerTest {
 
         // Then
         verify(receiptFactory, times(1))
-                .refundDebitForInvoice(any(), any());
+                .refundDebitForInvoice(any(), any(), anyLong());
         verify(cashregService, times(1))
                 .send(any());
     }
@@ -109,7 +109,7 @@ public class RefundSucceededHandlerTest {
                                         .setRefund(new com.rbkmoney.damsel.domain.InvoicePaymentRefund()
                                                 .setId("refundId"))))));
 
-        when(receiptFactory.refundDebitForPreviousPartialRefund(any(), any(), any()))
+        when(receiptFactory.refundDebitForPreviousPartialRefund(any(), any(), anyLong(), any()))
                 .thenReturn(new ReceiptParams());
         when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
@@ -119,7 +119,7 @@ public class RefundSucceededHandlerTest {
 
         // Then
         verify(receiptFactory, times(1))
-                .refundDebitForPreviousPartialRefund(any(), any(), any());
+                .refundDebitForPreviousPartialRefund(any(), any(), anyLong(), any());
         verify(cashregService, times(1))
                 .send(any());
     }
@@ -156,9 +156,9 @@ public class RefundSucceededHandlerTest {
 
         // Then
         verify(receiptFactory, times(1))
-                .refundDebitForInvoice(any(), any());
+                .refundDebitForInvoice(any(), any(), anyLong());
         verify(receiptFactory, times(1))
-                .debitForPartialRefund(any(), any(), any());
+                .debitForPartialRefund(any(), any(), anyLong(), any());
         verify(cashregService, times(2))
                 .send(any());
     }
