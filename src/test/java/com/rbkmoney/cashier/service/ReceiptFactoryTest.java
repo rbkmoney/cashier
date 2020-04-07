@@ -1,15 +1,14 @@
 package com.rbkmoney.cashier.service;
 
-import com.rbkmoney.damsel.cashreg.ItemsLine;
-import com.rbkmoney.damsel.cashreg.type.Debit;
-import com.rbkmoney.damsel.cashreg.type.RefundDebit;
-import com.rbkmoney.damsel.cashreg.type.Type;
-import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
-import com.rbkmoney.damsel.cashreg_processing.ManagementSrv;
+import com.rbkmoney.cashier.mapper.CashRegisterMapper;
+import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
+import com.rbkmoney.damsel.cashreg.receipt.ItemsLine;
+import com.rbkmoney.damsel.cashreg.receipt.type.Debit;
+import com.rbkmoney.damsel.cashreg.receipt.type.RefundDebit;
+import com.rbkmoney.damsel.cashreg.receipt.type.Type;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.Invoice;
 import com.rbkmoney.damsel.payment_processing.InvoicePayment;
-import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,44 +20,29 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CashRegServiceTest {
+public class ReceiptFactoryTest {
 
     @Mock
     private CartTransformer cartTransformer;
     @Mock
     private EmailExtractor emailExtractor;
     @Mock
-    private ManagementSrv.Iface cashRegClient;
+    private CashRegisterMapper cashRegisterMapper;
 
     @InjectMocks
-    private CashRegService cashRegService;
+    private ReceiptFactory receiptFactory;
 
     @Before
     public void setUp() {
-        cashRegService.setReceiptsSendingEnabled(true);
-
         when(cartTransformer.transform(any()))
                 .thenReturn(List.of(new ItemsLine()));
         when(emailExtractor.extract(any()))
                 .thenReturn("email");
     }
-
-    @Test
-    public void shouldSendReceipts() throws TException {
-        // Given - When
-        cashRegService.send(
-                new CashRegParams(),
-                new CashRegParams(),
-                new CashRegParams());
-
-        // Then
-        verify(cashRegClient, times(3))
-                .create(any());
-    }
-
+    
     @Test
     public void shouldCreateDebitReceiptForInvoice() {
         // Given
@@ -78,11 +62,13 @@ public class CashRegServiceTest {
                                 .setId("paymentId"))));
 
         // When
-        CashRegParams receipt = cashRegService.debitForInvoice(
-                "providerId",
-                aggregate);
+        ReceiptParams receipt = receiptFactory.debitForInvoice(
+                List.of(),
+                aggregate,
+                1L);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.debit(new Debit()));
@@ -118,12 +104,14 @@ public class CashRegServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        CashRegParams receipt = cashRegService.debitForPartialCapture(
-                "providerId",
+        ReceiptParams receipt = receiptFactory.debitForPartialCapture(
+                List.of(),
                 aggregate,
+                1L,
                 capturedPayment);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.debit(new Debit()));
@@ -164,12 +152,14 @@ public class CashRegServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        CashRegParams receipt = cashRegService.debitForPartialRefund(
-                "providerId",
+        ReceiptParams receipt = receiptFactory.debitForPartialRefund(
+                List.of(),
                 aggregate,
+                1L,
                 refund);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.debit(new Debit()));
@@ -198,11 +188,13 @@ public class CashRegServiceTest {
                                 .setId("paymentId"))));
 
         // When
-        CashRegParams receipt = cashRegService.refundDebitForInvoice(
-                "providerId",
-                aggregate);
+        ReceiptParams receipt = receiptFactory.refundDebitForInvoice(
+                List.of(),
+                aggregate,
+                1L);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.refund-debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.refund_debit(new RefundDebit()));
@@ -243,12 +235,14 @@ public class CashRegServiceTest {
                                 .setSymbolicCode("RUB")));
 
         // When
-        CashRegParams receipt = cashRegService.refundDebitForPreviousPartialRefund(
-                "providerId",
+        ReceiptParams receipt = receiptFactory.refundDebitForPreviousPartialRefund(
+                List.of(),
                 aggregate,
+                1L,
                 refund);
 
         // Then
+        assertThat(receipt.getReceiptId()).isEqualTo("invoiceId.1.refund-debit");
         assertThat(receipt.getPartyId()).isEqualTo("ownerId");
         assertThat(receipt.getShopId()).isEqualTo("shopId");
         assertThat(receipt.getType()).isEqualTo(Type.refund_debit(new RefundDebit()));

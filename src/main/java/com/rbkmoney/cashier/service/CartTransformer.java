@@ -1,6 +1,6 @@
 package com.rbkmoney.cashier.service;
 
-import com.rbkmoney.damsel.cashreg.ItemsLine;
+import com.rbkmoney.damsel.cashreg.receipt.ItemsLine;
 import com.rbkmoney.damsel.domain.InvoiceCart;
 import com.rbkmoney.damsel.domain.InvoiceLine;
 import com.rbkmoney.damsel.msgpack.Value;

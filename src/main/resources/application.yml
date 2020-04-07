@@ -37,7 +37,7 @@ info:
   version: @project.version@
 
 client:
-  cash-reg:
+  cashreg:
     enabled: true
     url: http://changeit:8080
     timeout: 5000

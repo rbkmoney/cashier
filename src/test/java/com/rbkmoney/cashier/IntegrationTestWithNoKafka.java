@@ -3,8 +3,7 @@ package com.rbkmoney.cashier;
 import com.rbkmoney.cashier.handler.EventsHandler;
 import com.rbkmoney.cashier.repository.CashRegisterRepository;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
-import com.rbkmoney.cashier.repository.ProviderRepository;
-import com.rbkmoney.damsel.cashreg_processing.ManagementSrv;
+import com.rbkmoney.damsel.cashreg.processing.ManagementSrv;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.Invoice;
 import com.rbkmoney.damsel.payment_processing.InvoicePayment;
@@ -51,13 +50,10 @@ public class IntegrationTestWithNoKafka {
     private InvoiceAggregateRepository invoiceAggregateRepository;
 
     @MockBean
-    private ProviderRepository providerRepository;
-
-    @MockBean
     private CashRegisterRepository cashRegisterRepository;
 
     @MockBean
-    private ManagementSrv.Iface cashRegClient;
+    private ManagementSrv.Iface cashregClient;
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
@@ -93,15 +89,15 @@ public class IntegrationTestWithNoKafka {
 
         when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
-        when(providerRepository.findBy())
-                .thenReturn("providerId");
+        when(cashRegisterRepository.findByPartyIdAndShopId(anyString(), anyString()))
+                .thenReturn(List.of());
     }
 
     @Test
     public void shouldSendReceiptsToCashReg() throws TException {
         eventsHandler.handle(List.of(machineEvent()));
 
-        verify(cashRegClient, times(7))
+        verify(cashregClient, times(7))
                 .create(any());
     }
 
