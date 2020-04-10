@@ -14,11 +14,10 @@ import com.rbkmoney.damsel.domain_config.RepositoryClientSrv;
 import com.rbkmoney.damsel.domain_config.VersionedObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,20 +85,11 @@ public class CashRegisterValidator {
                 continue;
             }
 
-            if (providerParamType.isSetUrlType() && !isUrl(cashRegisterParam)) {
+            if (providerParamType.isSetUrlType() && !UrlValidator.getInstance().isValid(cashRegisterParam)) {
                 errors.put(providerParam.getId(), "Field must be a valid URL");
             }
         }
 
         return errors;
-    }
-
-    private boolean isUrl(String value) {
-        try {
-            new URL(value);
-            return true;
-        } catch (MalformedURLException e) {
-            return false;
-        }
     }
 }
