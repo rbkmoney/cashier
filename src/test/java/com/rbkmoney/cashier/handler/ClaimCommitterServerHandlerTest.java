@@ -1,13 +1,17 @@
 package com.rbkmoney.cashier.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.cashier.domain.CashRegister;
 import com.rbkmoney.cashier.repository.CashRegisterRepository;
+import com.rbkmoney.cashier.service.CashRegisterValidator;
 import com.rbkmoney.damsel.claim_management.*;
 import com.rbkmoney.damsel.domain.CategoryRef;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Map;
@@ -15,21 +19,15 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ClaimCommitterServerHandlerTest {
 
-    private CashRegisterRepository cashRegisterRepository;
+    @Mock private CashRegisterValidator cashRegisterValidator;
+    @Mock private CashRegisterRepository cashRegisterRepository;
+    @Captor private ArgumentCaptor<CashRegister> cashRegisterCaptor;
+
+    @InjectMocks
     private ClaimCommitterServerHandler claimCommitterServerHandler;
-
-    private ArgumentCaptor<CashRegister> cashRegisterCaptor;
-
-    @Before
-    public void setUp() {
-        cashRegisterCaptor = ArgumentCaptor.forClass(CashRegister.class);
-        cashRegisterRepository = mock(CashRegisterRepository.class);
-        claimCommitterServerHandler = new ClaimCommitterServerHandler(
-                cashRegisterRepository,
-                new ObjectMapper());
-    }
 
     @Test
     public void shouldCommitCashRegisterClaim() {

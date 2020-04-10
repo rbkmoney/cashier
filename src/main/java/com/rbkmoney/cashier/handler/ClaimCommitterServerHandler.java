@@ -1,33 +1,51 @@
 package com.rbkmoney.cashier.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.cashier.domain.CashRegister;
 import com.rbkmoney.cashier.repository.CashRegisterRepository;
+import com.rbkmoney.cashier.service.CashRegisterValidator;
+import com.rbkmoney.cashier.util.JsonMapper;
 import com.rbkmoney.damsel.claim_management.*;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ClaimCommitterServerHandler implements ClaimCommitterSrv.Iface {
 
+    private final CashRegisterValidator cashRegisterValidator;
     private final CashRegisterRepository cashRegisterRepository;
-    private final ObjectMapper objectMapper;
 
     @Override
-    public void accept(String partyId, Claim claim) throws PartyNotFound, InvalidChangeset, TException {
-        // TODO [a.romanov]: validate using dominant
+    public void accept(String partyId, Claim claim) throws TException {
+        Map<Modification, CashRegister> cashRegisters = claim.getChangeset()
+                .stream()
+                .map(modificationUnit -> Map.entry(
+                        modificationUnit.getModification(),
+                        findCashRegister(partyId, modificationUnit)))
+                .filter(entry -> entry.getValue().isPresent())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().get()));
+
+        cashRegisterValidator.validate(cashRegisters);
     }
 
     @Override
     public void commit(String partyId, Claim claim) {
         claim.getChangeset()
                 .forEach(modificationUnit -> findCashRegister(partyId, modificationUnit)
-                        .ifPresent(cashRegisterRepository::save));
+                        .ifPresent(cashRegister -> {
+                            log.info("Saving new cashRegister={}", cashRegister);
+                            cashRegisterRepository.save(cashRegister);
+                        }));
     }
 
     private Optional<CashRegister> findCashRegister(String partyId, ModificationUnit modificationUnit) {
@@ -84,7 +102,7 @@ public class ClaimCommitterServerHandler implements ClaimCommitterSrv.Iface {
 
         CashRegisterParams cashRegisterParams = cashRegisterModification.getCreation();
         builder.providerId(cashRegisterParams.getCashRegisterProviderId());
-        builder.providerParams(objectMapper.writeValueAsString(cashRegisterParams.getCashRegisterProviderParams()));
+        builder.providerParams(JsonMapper.toJson(cashRegisterParams.getCashRegisterProviderParams()));
 
         return Optional.of(builder.build());
     }
