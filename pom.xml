@@ -26,7 +26,7 @@
         <java.version>11</java.version>
         <exposed.ports>${server.port}</exposed.ports>
         <geck.version>0.6.4</geck.version>
-        <damsel.version>1.399-dfc81d0</damsel.version>
+        <damsel.version>1.400-978cb4c</damsel.version>
         <fistful-proto.version>1.36-683822a</fistful-proto.version>
         <cashreg-proto.version>1.13-f4f401b</cashreg-proto.version>
         <spring.kafka.version>2.2.3.RELEASE</spring.kafka.version>
@@ -78,6 +78,11 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.6</version>
         </dependency>
 
         <!--RBK libs-->

@@ -41,6 +41,9 @@ client:
     enabled: true
     url: http://changeit:8080
     timeout: 5000
+  dominant:
+    url: http://changeit:8080
+    timeout: 5000
   invoicing:
     url: http://changeit:8080
     timeout: 5000
