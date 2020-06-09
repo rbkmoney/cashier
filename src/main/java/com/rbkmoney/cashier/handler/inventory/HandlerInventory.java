@@ -1,5 +1,6 @@
 package com.rbkmoney.cashier.handler.inventory;
 
+import com.rbkmoney.cashier.handler.events.DefaultEventHandler;
 import com.rbkmoney.cashier.handler.events.iface.EventHandler;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,6 @@ public class HandlerInventory {
         return handlers.stream()
                 .filter(handler -> handler.isApplicable(change))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No handler was found for invoice change=" + change));
-
+                .orElse(new DefaultEventHandler());
     }
 }
