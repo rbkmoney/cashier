@@ -12,7 +12,7 @@ public class DefaultEventHandler implements EventHandler {
     @Override
     public void handle(InvoiceChangeWithMetadata invoiceChangeWithMetadata) {
         // NOTE: skip events if they are not being processed
-        log.info("No handler was found for invoice change=" + invoiceChangeWithMetadata.getInvoiceChange());
+        log.debug("No handler was found for invoice change=" + invoiceChangeWithMetadata.getInvoiceChange());
     }
 
     @Override
