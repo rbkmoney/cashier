@@ -1,14 +1,16 @@
 package com.rbkmoney.cashier;
 
+import com.rbkmoney.cashier.domain.CashRegister;
 import com.rbkmoney.cashier.handler.EventsHandler;
 import com.rbkmoney.cashier.repository.CashRegisterRepository;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
+import com.rbkmoney.cashier.util.JsonMapper;
 import com.rbkmoney.damsel.cashreg.processing.ManagementSrv;
 import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.damsel.payment_processing.Invoice;
 import com.rbkmoney.damsel.payment_processing.InvoicePayment;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentRefund;
-import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
@@ -18,6 +20,7 @@ import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +36,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -89,8 +94,10 @@ public class IntegrationTestWithNoKafka {
 
         when(invoiceAggregateRepository.findByInvoiceIdAndEventId("invoiceId", 0L))
                 .thenReturn(aggregate);
+
+        List<CashRegister> cashRegisters = prepareListCashRegisters();
         when(cashRegisterRepository.findByPartyIdAndShopId(anyString(), anyString()))
-                .thenReturn(List.of());
+                .thenReturn(cashRegisters);
     }
 
     @Test
@@ -180,5 +187,29 @@ public class IntegrationTestWithNoKafka {
     private static InvoiceChange fillTBaseObject(InvoiceChange tBase) {
         return new MockTBaseProcessor(MockMode.RANDOM, 15, 1)
                 .process(tBase, new TBaseHandler<>(InvoiceChange.class));
+    }
+
+
+    @NotNull
+    private List<CashRegister> prepareListCashRegisters() {
+        List<CashRegister> cashRegisters = new ArrayList<>();
+        CashRegister cashRegister = CashRegister.builder()
+                .id("id")
+                .partyId("partyId")
+                .shopId("shopId")
+                .providerId(1)
+                .providerParams(JsonMapper.toJson(prepareProviderParams()))
+                .build();
+        cashRegisters.add(cashRegister);
+        return cashRegisters;
+    }
+
+    @NotNull
+    private Map<String, String> prepareProviderParams() {
+        return Map.of(
+                "name", "pupa",
+                "password", "lupa",
+                "tel", "88005553535",
+                "url", "https://pupalupa.com/");
     }
 }
