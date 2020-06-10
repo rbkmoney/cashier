@@ -26,7 +26,7 @@
         <java.version>11</java.version>
         <exposed.ports>${server.port}</exposed.ports>
         <geck.version>0.6.4</geck.version>
-        <damsel.version>1.402-140a2a6</damsel.version>
+        <damsel.version>1.420-7ef2435</damsel.version>
         <fistful-proto.version>1.36-683822a</fistful-proto.version>
         <cashreg-proto.version>1.14-25a9f63</cashreg-proto.version>
         <spring.kafka.version>2.2.3.RELEASE</spring.kafka.version>
