@@ -4,10 +4,7 @@ import com.rbkmoney.cashier.domain.CashRegister;
 import com.rbkmoney.cashier.util.JsonMapper;
 import com.rbkmoney.damsel.claim_management.InvalidChangeset;
 import com.rbkmoney.damsel.claim_management.Modification;
-import com.rbkmoney.damsel.domain.CashRegisterProvider;
-import com.rbkmoney.damsel.domain.CashRegisterProviderParameter;
-import com.rbkmoney.damsel.domain.CashRegisterProviderParameterType;
-import com.rbkmoney.damsel.domain.CashRegisterProviderRef;
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain_config.Head;
 import com.rbkmoney.damsel.domain_config.Reference;
 import com.rbkmoney.damsel.domain_config.RepositoryClientSrv;
@@ -63,10 +60,10 @@ public class CashRegisterValidator {
                 cashRegisterProvider.getName());
 
         Map<String, String> providerParams = JsonMapper.toMap(cashRegister.getProviderParams());
-        List<CashRegisterProviderParameter> paramsSchema = cashRegisterProvider.getParamsSchema();
+        List<ProviderParameter> paramsSchema = cashRegisterProvider.getParamsSchema();
 
         Map<String, String> errors = new HashMap<>();
-        for (CashRegisterProviderParameter providerParam : paramsSchema) {
+        for (ProviderParameter providerParam : paramsSchema) {
             String cashRegisterParam = providerParams.get(providerParam.getId());
 
             if (!providerParam.isIsRequired() && cashRegisterParam == null) {
@@ -78,7 +75,7 @@ public class CashRegisterValidator {
                 continue;
             }
 
-            CashRegisterProviderParameterType providerParamType = providerParam.getType();
+            ProviderParameterType providerParamType = providerParam.getType();
 
             if (providerParamType.isSetIntegerType() && !cashRegisterParam.matches("\\d+")) {
                 errors.put(providerParam.getId(), "Field must be an integer");

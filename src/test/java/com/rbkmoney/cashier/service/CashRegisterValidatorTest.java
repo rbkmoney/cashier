@@ -14,7 +14,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Map;
 
-import static com.rbkmoney.damsel.domain.CashRegisterProviderParameterType.*;
+import static com.rbkmoney.damsel.domain.ProviderParameterType.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,23 +71,23 @@ public class CashRegisterValidatorTest {
     }
 
     private VersionedObject versionedObject() {
-        List<CashRegisterProviderParameter> paramsSchema = List.of(
-                new CashRegisterProviderParameter()
+        List<ProviderParameter> paramsSchema = List.of(
+                new ProviderParameter()
                         .setId("name")
                         .setIsRequired(true)
-                        .setType(string_type(new CashRegisterProviderParameterString())),
-                new CashRegisterProviderParameter()
+                        .setType(string_type(new ProviderParameterString())),
+                new ProviderParameter()
                         .setId("password")
                         .setIsRequired(false)
-                        .setType(password_type(new CashRegisterProviderParameterPassword())),
-                new CashRegisterProviderParameter()
+                        .setType(password_type(new ProviderParameterPassword())),
+                new ProviderParameter()
                         .setId("tel")
                         .setIsRequired(true)
-                        .setType(integer_type(new CashRegisterProviderParameterInteger())),
-                new CashRegisterProviderParameter()
+                        .setType(integer_type(new ProviderParameterInteger())),
+                new ProviderParameter()
                         .setId("url")
                         .setIsRequired(true)
-                        .setType(url_type(new CashRegisterProviderParameterUrl())));
+                        .setType(url_type(new ProviderParameterUrl())));
 
         return new VersionedObject()
                 .setObject(DomainObject.cash_register_provider(new CashRegisterProviderObject()
