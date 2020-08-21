@@ -41,7 +41,6 @@
         <sink-common-lib.version>0.0.5</sink-common-lib.version>
         <kafka-common-lib.version>0.1.5</kafka-common-lib.version>
         <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
-        <spring.kafka.version>2.2.3.RELEASE</spring.kafka.version>
 
         <logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
         <error-mapping-java.version>1.0.6</error-mapping-java.version>
@@ -83,7 +82,7 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>${spring.kafka.version}</version>
+            <version>${spring-kafka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -91,10 +90,13 @@
             <version>${spring-boot-starter-metrics-statsd.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>

@@ -1,6 +1,7 @@
 package com.rbkmoney.cashier.listener;
 
 import com.rbkmoney.cashier.handler.EventsHandler;
+import com.rbkmoney.kafka.common.util.LogUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithValues;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -35,8 +35,9 @@ public class InvoiceListener {
         eventsHandler.handle(machineEvents);
         ack.acknowledge();
 
+
         log.debug("{} records have been committed: {}",
                 messages.size(),
-                toSummaryStringWithValues(messages));
+                LogUtil.toSummaryStringWithMachineEventValues(messages));
     }
 }
