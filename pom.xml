@@ -4,32 +4,53 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.rbkmoney</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.2.RELEASE</version>
+    </parent>
+
     <artifactId>cashier</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>cashier</name>
-    <parent>
-        <groupId>com.rbkmoney</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.1.RELEASE</version>
-    </parent>
 
     <properties>
+        <server.port>8022</server.port>
+        <java.version>11</java.version>
+        <exposed.ports>${server.port}</exposed.ports>
         <sonar.jacoco.reportPath>target/sites/jacoco/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
         <shared.resources.version>0.3.6</shared.resources.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dockerfile.base.service.tag>bc95d0d6dc13c693acd2b274531a7d604b877bf3</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
-        <server.port>8022</server.port>
-        <java.version>11</java.version>
-        <exposed.ports>${server.port}</exposed.ports>
+
+        <damsel.version>1.439-b18f037</damsel.version>
+        <fistful-proto.version>1.95-ba8f0f2</fistful-proto.version>
+        <cashreg-proto.version>1.15-f4f228b</cashreg-proto.version>
+        <machinegun-proto.version>1.18-d814d69</machinegun-proto.version>
+        <xrates-proto.version>1.19-3e7d6fd</xrates-proto.version>
+
         <geck.version>0.6.4</geck.version>
-        <damsel.version>1.430-a1072d0</damsel.version>
-        <fistful-proto.version>1.36-683822a</fistful-proto.version>
-        <cashreg-proto.version>1.14-25a9f63</cashreg-proto.version>
+        <geck.version>[0.6.11,)</geck.version>
+        <commons-codec.version>[1.14,)</commons-codec.version>
+        <commons-validator.version>1.7</commons-validator.version>
+        <lombok.version>1.18.4</lombok.version>
+        <sink-common-lib.version>0.0.5</sink-common-lib.version>
+        <kafka-common-lib.version>0.1.5</kafka-common-lib.version>
+        <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
         <spring.kafka.version>2.2.3.RELEASE</spring.kafka.version>
+
+        <logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
+        <error-mapping-java.version>1.0.6</error-mapping-java.version>
+        <spring-boot-starter-metrics-statsd.version>1.1.2</spring-boot-starter-metrics-statsd.version>
+
+        <assertj-core.version>3.13.2</assertj-core.version>
+        <testcontainers-kafka.version>1.10.2</testcontainers-kafka.version>
+        <testcontainers-postgresql.version>1.8.3</testcontainers-postgresql.version>
+        <kafka-streams-test-utils.version>2.1.0</kafka-streams-test-utils.version>
     </properties>
 
     <dependencies>
@@ -55,6 +76,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
             <version>${spring.kafka.version}</version>
@@ -62,12 +88,12 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>spring-boot-starter-metrics-statsd</artifactId>
-            <version>1.1.0</version>
+            <version>${spring-boot-starter-metrics-statsd.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.4</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -82,7 +108,7 @@
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.6</version>
+            <version>${commons-validator.version}</version>
         </dependency>
 
         <!--RBK libs-->
@@ -94,12 +120,12 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>sink-common-lib</artifactId>
-            <version>0.0.3</version>
+            <version>${sink-common-lib.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>machinegun-proto</artifactId>
-            <version>1.12-ebae56f</version>
+            <version>${machinegun-proto.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -114,7 +140,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>xrates-proto</artifactId>
-            <version>1.7-5587fa8</version>
+            <version>${xrates-proto.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -134,7 +160,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>kafka-common-lib</artifactId>
-            <version>0.1.1</version>
+            <version>${kafka-common-lib.version}</version>
         </dependency>
 
         <!--Test libs-->
@@ -146,25 +172,25 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.13.2</version>
+            <version>${assertj-core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>kafka</artifactId>
-            <version>1.10.2</version>
+            <version>${testcontainers-kafka.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.8.3</version>
+            <version>${testcontainers-postgresql.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams-test-utils</artifactId>
-            <version>2.1.0</version>
+            <version>${kafka-streams-test-utils.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -252,6 +278,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
