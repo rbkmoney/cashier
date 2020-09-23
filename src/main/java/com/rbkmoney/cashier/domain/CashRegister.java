@@ -1,9 +1,6 @@
 package com.rbkmoney.cashier.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,6 +28,7 @@ public class CashRegister implements Serializable {
     @Column(name = "provider_id")
     private int providerId;
 
+    @ToString.Exclude
     @Column(name = "provider_params")
     private String providerParams;
 }
