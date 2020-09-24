@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.2.RELEASE</version>
+        <version>2.3.3.RELEASE</version>
     </parent>
 
     <artifactId>cashier</artifactId>
@@ -27,9 +27,9 @@
         <dockerfile.base.service.tag>57e26d8ee999d7b0b50248c22afc63e6f926d276</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
 
-        <damsel.version>1.439-b18f037</damsel.version>
+        <damsel.version>1.451-6c96a4d</damsel.version>
         <fistful-proto.version>1.95-ba8f0f2</fistful-proto.version>
-        <cashreg-proto.version>1.15-f4f228b</cashreg-proto.version>
+        <cashreg-proto.version>1.16-bb4c505</cashreg-proto.version>
         <machinegun-proto.version>1.18-d814d69</machinegun-proto.version>
         <xrates-proto.version>1.19-3e7d6fd</xrates-proto.version>
 
