@@ -2,13 +2,23 @@ server:
   port: @server.port@
 
 management:
-  security:
-    flag: false
   metrics:
     export:
       statsd:
         flavor: etsy
-        enabled: false
+      prometheus:
+        enabled: true
+  server:
+    port: @management.port@
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
 
 spring:
   application:
