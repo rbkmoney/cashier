@@ -6,8 +6,8 @@
 
     <parent>
         <groupId>com.rbkmoney</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.2.RELEASE</version>
+        <artifactId>service-parent-pom</artifactId>
+        <version>1.0.9</version>
     </parent>
 
     <artifactId>cashier</artifactId>
@@ -27,25 +27,16 @@
         <dockerfile.base.service.tag>bc95d0d6dc13c693acd2b274531a7d604b877bf3</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
 
-        <damsel.version>1.439-b18f037</damsel.version>
         <fistful-proto.version>1.95-ba8f0f2</fistful-proto.version>
         <cashreg-proto.version>1.15-f4f228b</cashreg-proto.version>
         <machinegun-proto.version>1.18-d814d69</machinegun-proto.version>
         <xrates-proto.version>1.19-3e7d6fd</xrates-proto.version>
-
-        <geck.version>0.6.4</geck.version>
-        <geck.version>[0.6.11,)</geck.version>
         <commons-codec.version>[1.14,)</commons-codec.version>
         <commons-validator.version>1.7</commons-validator.version>
-        <lombok.version>1.18.4</lombok.version>
         <sink-common-lib.version>0.0.5</sink-common-lib.version>
-        <kafka-common-lib.version>0.1.5</kafka-common-lib.version>
-        <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
-
         <logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
         <error-mapping-java.version>1.0.6</error-mapping-java.version>
         <spring-boot-starter-metrics-statsd.version>1.1.2</spring-boot-starter-metrics-statsd.version>
-
         <assertj-core.version>3.13.2</assertj-core.version>
         <testcontainers-kafka.version>1.10.2</testcontainers-kafka.version>
         <testcontainers-postgresql.version>1.8.3</testcontainers-postgresql.version>
@@ -77,12 +68,11 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate-validator.version}</version>
+            <version>6.1.5.Final</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>${spring-kafka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -96,7 +86,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -132,7 +121,6 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <version>${damsel.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -147,22 +135,18 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>shared-resources</artifactId>
-            <version>${shared.resources.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
             <artifactId>common</artifactId>
-            <version>${geck.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
             <artifactId>filter</artifactId>
-            <version>${geck.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>kafka-common-lib</artifactId>
-            <version>${kafka-common-lib.version}</version>
         </dependency>
 
         <!--Test libs-->
@@ -233,7 +217,7 @@
                 </dependencies>
                 <configuration>
                     <resourceBundles>
-                        <resourceBundle>com.rbkmoney:shared-resources:${shared.resources.version}</resourceBundle>
+                        <resourceBundle>com.rbkmoney:shared-resources:${shared-resources.version}</resourceBundle>
                     </resourceBundles>
                     <attachToMain>false</attachToMain>
                     <attachToTest>false</attachToTest>
@@ -254,29 +238,6 @@
                         <nonFilteredFileExtension>p12</nonFilteredFileExtension>
                     </nonFilteredFileExtensions>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.2</version>
-                <configuration>
-                    <destFile>${sonar.jacoco.reportPath}</destFile>
-                    <append>true</append>
-                    <excludes>
-                        <exclude>com/rbkmoney/cashier/config/**/*</exclude>
-                        <exclude>com/rbkmoney/cashier/domain/**/*</exclude>
-                        <exclude>com/rbkmoney/cashier/serde/**/*</exclude>
-                        <exclude>com/rbkmoney/cashier/parser/**/*</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
