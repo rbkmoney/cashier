@@ -1,7 +1,7 @@
 package com.rbkmoney.cashier.config;
 
 import com.rbkmoney.cashier.config.properties.KafkaSslProperties;
-import com.rbkmoney.cashier.serde.MachineEventDeserializer;
+import com.rbkmoney.cashier.serde.SinkEventDeserializer;
 import com.rbkmoney.kafka.common.exception.handler.SeekToCurrentWithSleepBatchErrorHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import org.apache.kafka.clients.CommonClientConfigs;
@@ -47,7 +47,7 @@ public class KafkaConfig {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MachineEventDeserializer.class);
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SinkEventDeserializer.class);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         properties.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
         properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);

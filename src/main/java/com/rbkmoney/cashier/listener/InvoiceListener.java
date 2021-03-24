@@ -1,13 +1,14 @@
 package com.rbkmoney.cashier.listener;
 
 import com.rbkmoney.cashier.handler.EventsHandler;
-import com.rbkmoney.kafka.common.util.LogUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,18 +27,18 @@ public class InvoiceListener {
             topics = "${kafka.invoice-topic}",
             containerFactory = "kafkaListenerContainerFactory")
     public void listen(
-            List<ConsumerRecord<String, MachineEvent>> messages,
+            List<SinkEvent> batch,
+            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.OFFSET) int offset,
             Acknowledgment ack) {
-        List<MachineEvent> machineEvents = messages.stream()
-                .map(ConsumerRecord::value)
+        log.info("Listening Invoice: partition={}, offset={}, batch.size()={}", partition, offset, batch.size());
+        List<MachineEvent> machineEvents = batch.stream()
+                .map(SinkEvent::getEvent)
                 .collect(toList());
 
         eventsHandler.handle(machineEvents);
+
         ack.acknowledge();
-
-
-        log.debug("{} records have been committed: {}",
-                messages.size(),
-                LogUtil.toSummaryStringWithMachineEventValues(messages));
+        log.info("Ack Invoice: partition={}, offset={}", partition, offset);
     }
 }
