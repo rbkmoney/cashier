@@ -65,11 +65,15 @@ public class KafkaConfig {
             Map<String, Object> properties,
             KafkaSslProperties sslProperties) {
         properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL.name());
-        properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, new File(sslProperties.getTrustStoreLocation()).getAbsolutePath());
+        properties.put(
+                SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG,
+                new File(sslProperties.getTrustStoreLocation()).getAbsolutePath());
         properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, sslProperties.getTrustStorePassword());
         properties.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, sslProperties.getKeyStoreType());
         properties.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, sslProperties.getTrustStoreType());
-        properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, new File(sslProperties.getKeyStoreLocation()).getAbsolutePath());
+        properties.put(
+                SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG,
+                new File(sslProperties.getKeyStoreLocation()).getAbsolutePath());
         properties.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, sslProperties.getKeyStorePassword());
         properties.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, sslProperties.getKeyPassword());
     }
@@ -80,9 +84,11 @@ public class KafkaConfig {
     }
 
     @Bean
+    @SuppressWarnings("LineLength")
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, MachineEvent>> kafkaListenerContainerFactory(
             ConsumerFactory<String, MachineEvent> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, MachineEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        ConcurrentKafkaListenerContainerFactory<String, MachineEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setBatchListener(true);
         factory.getContainerProperties().setAckOnError(false);

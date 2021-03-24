@@ -179,14 +179,14 @@ public class IntegrationTestWithNoKafka {
     }
 
     @SneakyThrows
-    public byte[] toByteArray(TBase tBase) {
-        return new TSerializer(new TBinaryProtocol.Factory()).serialize(tBase);
+    public byte[] toByteArray(TBase thriftBase) {
+        return new TSerializer(new TBinaryProtocol.Factory()).serialize(thriftBase);
     }
 
     @SneakyThrows
-    private static InvoiceChange fillTBaseObject(InvoiceChange tBase) {
+    private static InvoiceChange fillTBaseObject(InvoiceChange thriftBase) {
         return new MockTBaseProcessor(MockMode.RANDOM, 15, 1)
-                .process(tBase, new TBaseHandler<>(InvoiceChange.class));
+                .process(thriftBase, new TBaseHandler<>(InvoiceChange.class));
     }
 
 
