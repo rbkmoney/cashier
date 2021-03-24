@@ -3,12 +3,12 @@ package com.rbkmoney.cashier.handler;
 import com.rbkmoney.cashier.domain.CashRegister;
 import com.rbkmoney.cashier.domain.InvoiceChangeWithMetadata;
 import com.rbkmoney.cashier.handler.inventory.HandlerInventory;
-import com.rbkmoney.cashier.parser.SourceEventParser;
 import com.rbkmoney.cashier.repository.CashRegisterRepository;
 import com.rbkmoney.cashier.repository.InvoiceAggregateRepository;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.damsel.payment_processing.Invoice;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.sink.common.parser.impl.MachineEventParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class EventsHandler {
     private final InvoiceAggregateRepository invoiceAggregateRepository;
     private final CashRegisterRepository cashRegisterRepository;
     private final HandlerInventory handlerInventory;
-    private final SourceEventParser eventParser;
+    private final MachineEventParser<EventPayload> eventParser;
 
     public void handle(List<MachineEvent> machineEvents) {
         machineEvents.stream()
