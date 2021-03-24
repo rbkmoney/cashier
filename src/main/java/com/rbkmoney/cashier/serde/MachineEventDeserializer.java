@@ -12,7 +12,7 @@ import java.util.Map;
 @Slf4j
 public class MachineEventDeserializer implements Deserializer<MachineEvent> {
 
-    private ThreadLocal<TDeserializer> tDeserializerThreadLocal = ThreadLocal.withInitial(
+    private ThreadLocal<TDeserializer> thriftDeserializerThreadLocal = ThreadLocal.withInitial(
             () -> new TDeserializer(
                     new TBinaryProtocol.Factory()));
 
@@ -21,7 +21,7 @@ public class MachineEventDeserializer implements Deserializer<MachineEvent> {
         SinkEvent machineEvent = new SinkEvent();
 
         try {
-            tDeserializerThreadLocal.get().deserialize(machineEvent, data);
+            thriftDeserializerThreadLocal.get().deserialize(machineEvent, data);
         } catch (Exception e) {
             log.error("Deserialization error. Machine event data: {} ", data, e);
         }

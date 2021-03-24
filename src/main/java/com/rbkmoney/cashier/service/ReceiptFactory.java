@@ -171,10 +171,21 @@ public class ReceiptFactory {
     }
 
     private String typeString(Type type) {
-        if (type.isSetCredit()) return CREDIT;
-        if (type.isSetDebit()) return DEBIT;
-        if (type.isSetRefundCredit()) return REFUND_CREDIT;
-        if (type.isSetRefundDebit()) return REFUND_DEBIT;
+        if (type.isSetCredit()) {
+            return CREDIT;
+        }
+
+        if (type.isSetDebit()) {
+            return DEBIT;
+        }
+
+        if (type.isSetRefundCredit()) {
+            return REFUND_CREDIT;
+        }
+
+        if (type.isSetRefundDebit()) {
+            return REFUND_DEBIT;
+        }
 
         throw new IllegalArgumentException("Unknown receipt type: " + type);
     }

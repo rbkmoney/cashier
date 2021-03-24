@@ -38,11 +38,14 @@ public class ClaimCommitterServerHandlerTest {
                                 PartyModification.shop_modification(new ShopModificationUnit()
                                         .setId("shop-id")
                                         .setModification(
-                                                ShopModification.cash_register_modification_unit(new CashRegisterModificationUnit()
-                                                        .setId("cash-register-id")
-                                                        .setModification(CashRegisterModification.creation(new CashRegisterParams()
-                                                                .setCashRegisterProviderId(1)
-                                                                .setCashRegisterProviderParams(Map.of("a", "b")))))))))));
+                                                ShopModification.cash_register_modification_unit(
+                                                        new CashRegisterModificationUnit()
+                                                                .setId("cash-register-id")
+                                                                .setModification(CashRegisterModification
+                                                                        .creation(new CashRegisterParams()
+                                                                                .setCashRegisterProviderId(1)
+                                                                                .setCashRegisterProviderParams(
+                                                                                        Map.of("a", "b")))))))))));
 
         // When
         claimCommitterServerHandler.commit("party-id", claim);

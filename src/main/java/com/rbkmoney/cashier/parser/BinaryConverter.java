@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BinaryConverter {
 
-    private ThreadLocal<TDeserializer> tDeserializerThreadLocal = ThreadLocal.withInitial(
+    private ThreadLocal<TDeserializer> thriftDeserializerThreadLocal = ThreadLocal.withInitial(
             () -> new TDeserializer(
                     new TBinaryProtocol.Factory()));
 
@@ -19,7 +19,7 @@ public class BinaryConverter {
         EventPayload event = new EventPayload();
 
         try {
-            tDeserializerThreadLocal.get().deserialize(event, bin);
+            thriftDeserializerThreadLocal.get().deserialize(event, bin);
         } catch (TException e) {
             log.error("BinaryConverter exception: ", e);
         }

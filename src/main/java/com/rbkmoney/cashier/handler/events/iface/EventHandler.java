@@ -6,5 +6,6 @@ import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 public interface EventHandler {
 
     void handle(InvoiceChangeWithMetadata invoiceChangeWithMetadata);
+
     boolean isApplicable(InvoiceChange invoiceChange);
 }
