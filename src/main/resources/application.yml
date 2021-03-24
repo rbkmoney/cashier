@@ -42,7 +42,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/cashier
     user: changeit
     password: changeit
-    table: schema_version
+    table: flyway_schema_history
 
 info:
   version: @project.version@
