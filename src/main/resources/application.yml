@@ -1,16 +1,21 @@
 server:
-  port: @server.port@
+  port: '@server.port@'
 
 management:
+  security:
+    flag: false
+  server:
+    port: '@management.port@'
   metrics:
     export:
       statsd:
         flavor: etsy
+        enabled: false
       prometheus:
-        enabled: true
-  server:
-    port: @management.port@
+        enabled: false
   endpoint:
+    health:
+      show-details: always
     metrics:
       enabled: true
     prometheus:
@@ -22,7 +27,7 @@ management:
 
 spring:
   application:
-    name: @project.name@
+    name: '@project.name@'
   output:
     ansi:
       enabled: always

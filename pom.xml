@@ -17,14 +17,13 @@
     <name>cashier</name>
 
     <properties>
-        <java.version>11</java.version>
         <server.port>8022</server.port>
         <management.port>8023</management.port>
         <exposed.ports>${server.port} ${management.port}</exposed.ports>
         <sonar.jacoco.reportPath>target/sites/jacoco/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dockerfile.base.service.tag>57e26d8ee999d7b0b50248c22afc63e6f926d276</dockerfile.base.service.tag>
+        <dockerfile.base.service.tag>c0612d6052ac049496b72a23a04acb142035f249</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
 
         <fistful-proto.version>1.95-ba8f0f2</fistful-proto.version>
@@ -36,7 +35,6 @@
         <sink-common-lib.version>0.0.5</sink-common-lib.version>
         <logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
         <error-mapping-java.version>1.0.6</error-mapping-java.version>
-        <spring-boot-starter-metrics-statsd.version>1.1.2</spring-boot-starter-metrics-statsd.version>
         <assertj-core.version>3.13.2</assertj-core.version>
         <testcontainers-kafka.version>1.10.2</testcontainers-kafka.version>
         <testcontainers-postgresql.version>1.8.3</testcontainers-postgresql.version>
