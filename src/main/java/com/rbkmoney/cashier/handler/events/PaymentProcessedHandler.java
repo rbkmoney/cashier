@@ -42,7 +42,7 @@ public class PaymentProcessedHandler extends AbstractEventHandler {
         String invoiceId = invoiceChangeWithMetadata.getInvoiceId();
         long eventId = invoiceChangeWithMetadata.getEventId();
 
-        log.debug("Handling new PaymentProcessed event: invoiceId={}, eventId={}...", invoiceId, eventId);
+        log.info("Handling new PaymentProcessed event: invoiceId={}, eventId={}", invoiceId, eventId);
 
         Invoice aggregate = invoiceAggregateRepository.findByInvoiceIdAndEventId(
                 invoiceId,
@@ -59,6 +59,6 @@ public class PaymentProcessedHandler extends AbstractEventHandler {
 
         cashregService.send(debitForInvoice);
 
-        log.debug("Finished handling PaymentProcessed event: invoiceId={}, eventId={}", invoiceId, eventId);
+        log.info("Finished handling PaymentProcessed event: invoiceId={}, eventId={}", invoiceId, eventId);
     }
 }

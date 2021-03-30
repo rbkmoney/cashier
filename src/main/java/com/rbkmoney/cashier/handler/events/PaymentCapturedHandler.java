@@ -43,7 +43,7 @@ public class PaymentCapturedHandler extends AbstractEventHandler {
         String invoiceId = invoiceChangeWithMetadata.getInvoiceId();
         long eventId = invoiceChangeWithMetadata.getEventId();
 
-        log.debug("Handling new PaymentCaptured event: invoiceId={}, eventId={}...", invoiceId, eventId);
+        log.info("Handling new PaymentCaptured event: invoiceId={}, eventId={}", invoiceId, eventId);
 
         InvoicePaymentCaptured capturedPayment = invoiceChangeWithMetadata
                 .getInvoiceChange()
@@ -82,6 +82,6 @@ public class PaymentCapturedHandler extends AbstractEventHandler {
                 refundDebitForInvoice,
                 debitForPartialCapture);
 
-        log.debug("Finished handling PaymentCaptured event: invoiceId={}, eventId={}", invoiceId, eventId);
+        log.info("Finished handling PaymentCaptured event: invoiceId={}, eventId={}", invoiceId, eventId);
     }
 }
