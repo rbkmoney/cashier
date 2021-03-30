@@ -42,7 +42,7 @@ public class PaymentCancelledHandler extends AbstractEventHandler {
         String invoiceId = invoiceChangeWithMetadata.getInvoiceId();
         long eventId = invoiceChangeWithMetadata.getEventId();
 
-        log.debug("Handling new PaymentCancelled event: invoiceId={}, eventId={}...", invoiceId, eventId);
+        log.info("Handling new PaymentCancelled event: invoiceId={}, eventId={}", invoiceId, eventId);
 
         Invoice aggregate = invoiceAggregateRepository.findByInvoiceIdAndEventId(
                 invoiceId,
@@ -59,6 +59,6 @@ public class PaymentCancelledHandler extends AbstractEventHandler {
 
         cashregService.send(refundDebitForInvoice);
 
-        log.debug("Finished handling PaymentCancelled event: invoiceId={}, eventId={}", invoiceId, eventId);
+        log.info("Finished handling PaymentCancelled event: invoiceId={}, eventId={}", invoiceId, eventId);
     }
 }

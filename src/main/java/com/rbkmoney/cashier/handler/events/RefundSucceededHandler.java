@@ -46,7 +46,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
         String invoiceId = invoiceChangeWithMetadata.getInvoiceId();
         long eventId = invoiceChangeWithMetadata.getEventId();
 
-        log.debug("Handling new RefundSucceeded event: invoiceId={}, eventId={}...", invoiceId, eventId);
+        log.info("Handling new RefundSucceeded event: invoiceId={}, eventId={}...", invoiceId, eventId);
 
         Invoice aggregate = invoiceAggregateRepository.findByInvoiceIdAndEventId(
                 invoiceId,
@@ -87,7 +87,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
 
         cashregService.send(refundDebit);
 
-        log.debug("Finished handling RefundSucceeded event: invoiceId={}, eventId={}", invoiceId, eventId);
+        log.info("Finished handling RefundSucceeded event: invoiceId={}, eventId={}", invoiceId, eventId);
     }
 
     private Optional<ReceiptParams> refundDebitForPreviousPartialRefund(
