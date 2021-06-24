@@ -25,7 +25,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ContextConfiguration(classes = CashierApplication.class, initializers = CashRegisterRepositoryTest.Initializer.class)
+@ContextConfiguration(
+        classes = CashierApplication.class,
+        initializers = CashRegisterRepositoryTest.Initializer.class
+)
 public class CashRegisterRepositoryTest {
 
     @ClassRule
