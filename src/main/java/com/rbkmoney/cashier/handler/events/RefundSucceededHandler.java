@@ -108,7 +108,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
 
         Optional<InvoicePaymentRefund> previousPartialRefund = findPartialRefundById(
                 payments,
-                previousRefundId.get());
+                previousRefundId.get());//NOSONAR
 
         if (previousPartialRefund.isEmpty()) {
             log.debug("Previous successful refund was NOT partial");
@@ -121,7 +121,7 @@ public class RefundSucceededHandler extends AbstractEventHandler {
                         cashRegisters,
                         aggregate,
                         eventId,
-                        previousPartialRefund.get()));
+                        previousPartialRefund.get()));//NOSONAR
     }
 
     private Optional<String> findPreviousSuccessfulRefundId(
